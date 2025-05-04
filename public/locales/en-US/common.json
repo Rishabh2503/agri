@@ -1,0 +1,62 @@
+{
+    "navbar": {
+        "home": "Home",
+        "products": "Products",
+        "about": "About Us",
+        "contact": "Contact",
+        "search": "Search products...",
+        "login": "Login",
+        "register": "Register",
+        "cart": "Cart",
+        "profile": "My Profile",
+        "logout": "Logout",
+        "language": "Language"
+    },
+    "footer": {
+        "about": "About KrishiMart",
+        "aboutText": "KrishiMart is a platform connecting farmers directly with consumers, ensuring fresh produce and fair prices.",
+        "quickLinks": "Quick Links",
+        "contact": "Contact Us",
+        "subscribe": "Subscribe to our newsletter",
+        "subscribeButton": "Subscribe",
+        "copyright": "© {{year}} KrishiMart. All rights reserved.",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service"
+    },
+    "common": {
+        "loading": "Loading...",
+        "error": "An error occurred",
+        "retry": "Retry",
+        "close": "Close",
+        "save": "Save",
+        "cancel": "Cancel",
+        "submit": "Submit",
+        "delete": "Delete",
+        "edit": "Edit",
+        "more": "More",
+        "search": "Search",
+        "filter": "Filter",
+        "sort": "Sort",
+        "price": "Price",
+        "quantity": "Quantity",
+        "total": "Total",
+        "continue": "Continue",
+        "back": "Back"
+    },
+    "auth": {
+        "loginTitle": "Login to your account",
+        "registerTitle": "Create an account",
+        "email": "Email",
+        "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "fullName": "Full Name",
+        "phone": "Phone Number",
+        "address": "Address",
+        "loginBtn": "Login",
+        "registerBtn": "Register",
+        "forgotPassword": "Forgot password?",
+        "noAccount": "Don't have an account?",
+        "hasAccount": "Already have an account?",
+        "resetPassword": "Reset Password"
+    }
+}

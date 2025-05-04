@@ -1,0 +1,45 @@
+{
+    "hero": {
+        "title": "Fresh from Farm to Table",
+        "subtitle": "Get fresh, organic produce directly from farmers",
+        "btnText": "Shop Now"
+    },
+    "features": {
+        "title": "Why Choose KrishiMart?",
+        "freshProduce": {
+            "title": "Fresh Produce",
+            "description": "Farm-fresh produce delivered directly to your doorstep"
+        },
+        "directFromFarmers": {
+            "title": "Direct from Farmers",
+            "description": "Support local farmers and get the best quality"
+        },
+        "organicOptions": {
+            "title": "Organic Options",
+            "description": "Choose from a wide range of organic products"
+        },
+        "doorstepDelivery": {
+            "title": "Doorstep Delivery",
+            "description": "Convenient delivery right to your home"
+        }
+    },
+    "popularProducts": {
+        "title": "Popular Products",
+        "subtitle": "Our best-selling products",
+        "viewAll": "View All Products"
+    },
+    "testimonials": {
+        "title": "What Our Customers Say",
+        "subtitle": "Hear from our satisfied customers"
+    },
+    "categories": {
+        "title": "Browse by Category",
+        "subtitle": "Find products by category",
+        "viewAll": "View All Categories"
+    },
+    "cta": {
+        "title": "Ready to enjoy fresh produce?",
+        "subtitle": "Join thousands of happy customers",
+        "btnText": "Start Shopping"
+    }
+}
