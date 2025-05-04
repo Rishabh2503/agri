@@ -2,7 +2,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import React, { Suspense, lazy } from 'react';
 import { useAuth } from './hooks/useAuth';
 import Loader from './components/common/Loader';
-import MainLayout from './components/Layout/MainLayout';
 import AuthLayout from './components/layout/AuthLayout';
 import Footer from './components/footer/Footer';
 import { CropProvider } from './context/CropContext';
@@ -12,6 +11,8 @@ import RentalEquipmentDetails from './pages/rentalEquipment/RentalEquimentDetial
 import RentalEquipment from './pages/rentalEquipment/RentalEquipment';
 import CropPrediction from './pages/cropPrediction/cropPrediciton';
 import Dashboard from './pages/dashboard/Dashboard';
+import Chat from './pages/chat/Chat';
+import MainLayout from './components/layout/MainLayout';
 
 // Lazy-loaded pages
 const Home = lazy(() => import('./pages/Home/Home'));
@@ -45,7 +46,7 @@ function App() {
             <Route path="/crop-prediction" element={<CropPrediction />} />
             <Route path="/dashboard" element={<Dashboard />} />
             {/* <Route path="/add-product" element={<AddProduct />} /> */}
-            {/* <Route path="/chat" element={<Chat />} /> */}
+            <Route path="/chat" element={<Chat />} />
             <Route path="/profile" element={
               <ProtectedRoute>
                 <Profile />
