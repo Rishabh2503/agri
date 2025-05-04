@@ -8,6 +8,10 @@ import Footer from './components/footer/Footer';
 import { CropProvider } from './context/CropContext';
 import LandLeasing from './pages/LandLeasing/LandLeasing';
 import LandLeasingDetails from './components/landLeasing/LandLeasingDetails';
+import RentalEquipmentDetails from './pages/rentalEquipment/RentalEquimentDetials';
+import RentalEquipment from './pages/rentalEquipment/RentalEquipment';
+import CropPrediction from './pages/cropPrediction/cropPrediciton';
+import Dashboard from './pages/dashboard/Dashboard';
 
 // Lazy-loaded pages
 const Home = lazy(() => import('./pages/Home/Home'));
@@ -35,9 +39,14 @@ function App() {
           <Route path="/" element={<MainLayout />}>
             <Route index element={<Home />} />
             <Route path="/land-leasing" element={<LandLeasing />} />
-          <Route path="/land-leasing/:id" element={<LandLeasingDetails />} />
-          
-            <Route path="profile" element={
+            <Route path="/land-leasing/:id" element={<LandLeasingDetails />} />
+            <Route path="/rental-equipment" element={<RentalEquipment />} />
+            <Route path="/rental-equipment/:id" element={<RentalEquipmentDetails />} />
+            <Route path="/crop-prediction" element={<CropPrediction />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            {/* <Route path="/add-product" element={<AddProduct />} /> */}
+            {/* <Route path="/chat" element={<Chat />} /> */}
+            <Route path="/profile" element={
               <ProtectedRoute>
                 <Profile />
               </ProtectedRoute>

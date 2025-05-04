@@ -4,7 +4,7 @@ import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 
 import { DateRangePicker } from 'react-date-range';
-import { createEquipment, getBrands, getEquips } from '../../api/equipments';
+import { createEquipment, getBrands, getEquips } from '../../api/equiment';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';

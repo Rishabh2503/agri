@@ -1,602 +1,536 @@
-// import React, { useEffect, useState } from 'react'
-// import './Dashboard.css';
-// import ProductItem from '../../components/dashboardComponent/product/ProductItem';
-// import Dropdown from '../../components/dropdown/Dropdown';
-// import { getEquips, getEquipsList } from '../../api/equipments';
-// import { DateRangePicker } from 'react-date-range';
-// import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
-
-// const Dashboard = () => {
-//     const [equipments, setEquipments] = useState(null);
-//     const [equipList, setEquipList] = useState([]);
-//     const [searchInput, setSearchInput] = useState('');
-//     const [visible1, setVisible1] = useState(false);
-//     const [visible2, setVisible2] = useState(false);
-//     const [change, setChange] = useState(false);
-//     const [perDay, setPerDay] = useState(10000);
-//     const [startDate, setStartDate] = useState(new Date());
-//     const [endDate, setEndDate] = useState(new Date());
-//     const [filteredEquipments, setFilteredEquipments] = useState(null);
-
-//     useEffect(() => {
-//       const getEquipments = async () => {
-//         const { data } = await getEquips();
-//         setEquipments(data);
-//         setFilteredEquipments(data);
-//         // console.log(data);
-//       }
-//       getEquipments();
-//     }, [])
-
-//     useEffect(() => {
-//         const getEquipmentsList = async () => {
-//             const { data } = await getEquipsList();
-//             // console.log(data, "list");
-//             setEquipList(data);
-//           }
-//           getEquipmentsList();
-//     }, []);
-
-
-//     useEffect(() => {
-//         if(searchInput)
-//             setFilteredEquipments(equipments?.filter(equipment => equipment?.title?.toLowerCase().includes(searchInput.toLowerCase())));
-//         if(perDay)
-//             setFilteredEquipments(equipments?.filter(equipment => equipment?.daily_rental<=(perDay)));
-//     }, [change]);
-
-//     const selectionRange = {
-//         startDate: startDate,
-//         endDate: endDate,
-//         key: 'selection'
-//     }
-
-
-//     const commands = [
-//         {
-//           command: ["Go to * page", "Go to *", "Open * page", "Open *"],
-//           callback: (redirectPage) => setVoiceSearch(redirectPage),
-//         },
-//       ];
-
-//       const { transcript } = useSpeechRecognition({ commands });
-//       const [voiceSearch, setVoiceSearch] = useState("");
-//     //   const pages = ["home", "dashboard", "booking", "contact", "profile"];
-//     //   const urls = {
-//     //       home: "/",
-//     //       blog: "/dashboard",
-//     //       booking: "/booking",
-//     //       contact: "/contact",
-//     //       profile: "/update-profile",
-//     //   };
-
-//       if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
-//           return null;
-//       }
-//       console.log(voiceSearch, "voiceSearch");
-
-//       let redirect = "";
-
-//       if (voiceSearch) {
-//         //   if (pages.includes(redirectUrl)) {
-//         //     // equipList
-//         //     searchInput = redirectUrl;
-//         //   } else {
-//         //   redirect = <p>Could not find page: {redirectUrl}</p>;
-//         //   }
-//         searchInput=voiceSearch;
-//       }
-
-
-
-//     return (
-//         <>
-//         {redirect}
-//         <p id="transcript">Transcript: {transcript}</p>
-
-//         <button onClick={SpeechRecognition.startListening}>Start</button>
-//             {/* <div className='h-4 w-full my-4 bg-[#D8F5DE]'></div> */}
-//             <div className='max-w-7xl my-10 mx-auto'>
-//                 <div className='mt-4'>
-//                     <div className='flex justify-around'>
-//                         <h1 className='text-2xl font-bold text-gray-600 text-right'>Search Equipments</h1>
-//                         <div className=''>
-//                             <div className="input-group relative flex items-stretch w-full mb-4">
-//                                     <input onChange={(e) => {setSearchInput(e.target.value); setChange(!change)}} type="search" className="searchInput form-control relative flex-auto min-w-0 block w-full px-3 py-3 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" placeholder="Enter your Equipment here......" aria-label="Search" aria-describedby="button-addon3" />
-//                                     <button className="searchBtn btn inline-block px-6 py-2 text-green-600 font-medium text-sm leading-tight uppercase rounded hover:bg-black hover:bg-opacity-5 cursor-pointer focus:outline-none focus:ring-0 transition duration-150 ease-in-out" type="button" id="button-addon3">Search</button>
-//                             </div>
-//                         </div>
-//                     </div>
-//                     <div className='flex mb-10 justify-around'>
-//                         <div className="flex w-[240px] h-[40px] items-center border-2 rounded-lg border-[#68AC5D] px-1">
-//                             <i className="text-[#68AC5D] pl-4 pr-2 fa-solid fa-location-dot"></i>
-//                             <input className="searchDash appearance-none bg-transparent w-full text-gray-800 font-semibold mr-1 py-0.5 px-1 leading-tight focus:outline-none" type="text" placeholder="Enter Pincode (eg 201301)" aria-label="Full name" />
-//                         </div>
-//                         <h1 className='mt-3 mb-3 text-md font-semibold text-gray-500 text-center'>Search your desired Equipments directly by entering a keyword or the whole name.</h1>
-//                     </div>
-
-//                     <div className='flex justify-around w-full'>
-//                         <div className='w-1/4'>
-//                             <div className='bg-[#68AC5D] py-4 px-1 prFilter'>
-//                                 <h1 className='text-lg font-bold text-center text-white'>Product Filters</h1>
-//                             </div>
-
-//                             <div className='border py-6'>
-//                                 <span className='text-lg mb-4 font-semibold text-[#4F4F4F] border-b-2 border-[#68AC5D] pb-1 ml-6'>Categories:</span>
-
-//                                 <div className='my-5'>
-//                                     {
-//                                         equipList?.map(list => (
-//                                         <Dropdown key={list.id} title={list.name} />
-//                                         ))
-//                                     }
-//                                 </div>
-
-//                                 <span className='text-lg mb-4 font-semibold text-[#4F4F4F] border-b-2 border-[#68AC5D] pb-1 ml-6'>Brands</span>
-
-//                                 <div className='my-5'>
-//                                     <Dropdown title="Mahindra" />
-//                                     <Dropdown title="John Deere" />
-//                                     <Dropdown title="CLAAS India" />
-//                                 </div>
-
-//                                 <span className='text-lg mb-4 font-semibold text-[#4F4F4F] border-b-2 border-[#68AC5D] pb-1 ml-6'>Price Range</span>
-
-//                                 <div className='my-5'>
-//                                     <p className='text-md font-semibold text-[#4F4F4F] pl-8'>Price per day</p>
-//                                     <input type="range" id="perDay" min="0" max="1000" onChange={(e) => {setPerDay(e.target.value); setChange(!change)}}
-//                                         className="rangeInput form-range text-green-100 appearance-none w-full h-6 p-0 bg-transparent focus:outline-none focus:ring-0 focus:shadow-none"
-//                                     />
-//                                     <p className='text-md mb-3 font-normal text-[#4F4F4F] pl-8'>Rs. 0 to 1,49,827</p>
-
-//                                     <p className='text-md font-semibold text-[#4F4F4F] pl-8'>Price per hour</p>
-//                                     <input type="range" id="customRange1"
-//                                         className="rangeInput form-range text-green-100 appearance-none w-full h-6 p-0 bg-transparent focus:outline-none focus:ring-0 focus:shadow-none"
-//                                     />
-//                                     <p className='text-md mb-3 font-normal text-[#4F4F4F] pl-8'>Rs. 42 to 49,827</p>
-
-//                                     <p className='text-md font-semibold text-[#4F4F4F] pl-8'>Distance from You</p>
-//                                     <input type="range" id="customRange1"
-//                                         className="rangeInput form-range text-green-100 appearance-none w-full h-6 p-0 bg-transparent focus:outline-none focus:ring-0 focus:shadow-none"
-//                                     />
-//                                     {/* <input type="range" id="customRange1"
-//                                         className="rangeInput form-range text-green-100 appearance-none w-full h-6 p-0 bg-transparent focus:outline-none focus:ring-0 focus:shadow-none"
-//                                     /> */}
-//                                     {/* <input type="range" className='rangeInput' name="" id="" /> */}
-//                                     <p className='text-md font-normal text-[#4F4F4F] pl-8'>0 KM to 6.6 KM</p>
-//                                 </div>
-
-//                                 <span className='text-lg mb-4 font-semibold text-[#4F4F4F] border-b-2 border-[#68AC5D] pb-1 ml-6'>Availability Date</span>
-
-//                                 <p className='text-md pt-2 font-normal text-[#4F4F4F] pl-6'>From</p>
-
-//                                 <div className='flex justify-center items-center'>
-//                                     <button onClick={() => setVisible1(!visible1)} className="bg-darkgreen hover:bg-green-700 text-white font-normal text-sm py-1 text-center w-1/2 my-4 px-2 rounded">
-//                                         DD-MM-YYYY
-//                                     </button>
-//                                     <i className="ml-4 text-lg text-[#68AC5D] fa-solid fa-calendar"></i>
-//                                 </div>
-//                                 <div style={{ display: visible1 ? 'block' : 'none', height: '400px', width: '200px', 'zIndex': 1 }}>
-//                                     <DateRangePicker style={{ height: '300px', width: '280px' }}
-//                                         ranges={[selectionRange]}
-//                                         minDate={new Date()}
-//                                         // disabledDates={getDaysArray(new Date(),new Date())}
-//                                         rangeColors={["#68AC5D"]}
-//                                         // onChange={handleSelect}
-//                                         // maxDate={new Date()}
-//                                     />
-//                                 </div>
-
-
-//                                 <p className='text-md font-normal text-[#4F4F4F] pl-6'>To</p>
-//                                 <div className='flex justify-center items-center'>
-//                                     <button onClick={() => setVisible2(!visible2)} className="bg-darkgreen hover:bg-green-700 text-white font-normal text-sm py-1 text-center w-1/2 my-4 px-2 rounded">
-//                                         DD-MM-YYYY
-//                                     </button>
-//                                     <i className="ml-4 text-lg text-[#68AC5D] fa-solid fa-calendar"></i>
-//                                 </div>
-//                                 <div style={{ display: visible2 ? 'block' : 'none', height: '400px', width: '200px', 'zIndex': 1 }}>
-//                                     <DateRangePicker style={{ height: '300px', width: '280px' }}
-//                                         ranges={[selectionRange]}
-//                                         minDate={new Date()}
-//                                         // disabledDates={getDaysArray(new Date(),new Date())}
-//                                         rangeColors={["#68AC5D"]}
-//                                         // onChange={handleSelect}
-//                                         // maxDate={new Date()}
-//                                     />
-//                                 </div>
-
-//                             </div>
-
-//                             {/* <div className='w-11/12'>
-//                                 <div className='bg-[#68AC5D] -mt-5 py-4 ml-10 px-1 prFilter'>
-//                                     <h1 className='text-lg font-bold text-center text-white'>Set Date</h1>
-//                                 </div>
-//                             </div> */}
-
-
-
-//                         </div>
-
-//                         <div className='w-3/4 ml-8'>
-//                             <div className='relative flex justify-around'>
-//                                 <h1 className='absolute top-0 left-0 text-2xl font-bold text-gray-600'>Featured Products</h1>
-//                                 <button className="absolute top-0 right-10 shadow-md bg-darkgreen mx-auto hover:bg-green-700 text-white text-md font-normal py-1.5 px-3 rounded">
-//                                     More <i className="pl-1 w-5 fa-solid fa-angle-right"></i>
-//                                 </button>
-//                             </div>
-
-//                             <div className='flex flex-wrap items-center'>
-//                                 <div className='flex flex-wrap my-12'>
-//                                     {
-//                                         equipments?.filter(equipment => equipment?.title?.toLowerCase().includes(searchInput.toLowerCase()))?.map(equipment => (
-//                                             <ProductItem key={equipment.id} equipment={equipment} />
-//                                         ))
-//                                     }
-//                                     {/* {
-//                                         filteredEquipments?.map(equipment => (
-//                                             <ProductItem key={equipment.id} equipment={equipment} />
-//                                         ))
-//                                     } */}
-//                                     {/* {
-//                                         equipments?.filter(equipment => equipment?.daily_rental<=(perDay))?.map(equipment => (
-//                                             <ProductItem key={equipment.id} equipment={equipment} />
-//                                         ))
-//                                     } */}
-//                                 </div>
-//                             </div>
-
-//                             <div className='relative flex justify-around'>
-//                                 <h1 className='absolute top-0 left-0 text-2xl font-bold text-gray-600'>All Products</h1>
-//                                 <a className='absolute top-0 right-10 mx-auto hover:bg-green-700 text-green-600 text-sm font-normal'>View All</a>
-//                             </div>
-
-//                             <div className='flex flex-wrap items-center'>
-//                                 <div className='flex flex-wrap my-12'>
-//                                     {
-//                                         !searchInput ? (
-//                                             equipments?.map(equipment => (
-//                                                 <ProductItem key={equipment.id} equipment={equipment} />
-//                                             ))
-//                                         ) : (
-//                                             equipments?.filter(equipment => equipment?.title?.toLowerCase().includes(searchInput.toLowerCase()))?.map(equipment => (
-//                                                 <ProductItem key={equipment.id} equipment={equipment} />
-//                                             ))
-//                                         )
-//                                     }
-//                                 </div>
-//                             </div>
-
-
-//                         </div>
-//                     </div>
-//                 </div>
-//             </div>
-//         </>
-//     )
-// }
-
-// export default Dashboard
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import './Dashboard.css';
-import ProductItem from '../../components/dashboardComponent/product/ProductItem';
-import Dropdown from '../../components/dropdown/Dropdown';
-import { getEquips, getEquipsList } from '../../api/equipments';
+import { getEquips, getEquipsList } from '../../api/equiment';
 import { DateRangePicker } from 'react-date-range';
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
-import { Navigate, useNavigate } from 'react-router-dom';
+import { FaSearch, FaMicrophone, FaMapMarkerAlt, FaTractor, FaRupeeSign, FaFilter, FaStar, FaCalendarAlt } from 'react-icons/fa';
+import { MdAgriculture, MdVerified } from 'react-icons/md';
+import { BiArea } from 'react-icons/bi';
+import { BsArrowRight } from 'react-icons/bs';
+import Dropdown from '../../components/dropdown/Dropdown';
+
 
 const Dashboard = () => {
-    const [equipments, setEquipments] = useState(null);
-    const [equipList, setEquipList] = useState([]);
+    // State variables
+    const [activeTab, setActiveTab] = useState('equipment');
     const [searchInput, setSearchInput] = useState('');
-    const [visible1, setVisible1] = useState(false);
-    const [visible2, setVisible2] = useState(false);
     const [change, setChange] = useState(false);
-    const [perDay, setPerDay] = useState(10000);
-    const [perHour, setPerHour] = useState(1000);
-    const [distance, setDistance] = useState(1);
-    const [startDate, setStartDate] = useState(new Date());
-    const [endDate, setEndDate] = useState(new Date());
-    const [filteredEquipments, setFilteredEquipments] = useState(null);
-    const navigate = useNavigate();
+    const [perDay, setPerDay] = useState(50000);
+    const [visible1, setVisible1] = useState(false);
+    const [equipments, setEquipments] = useState([]);
+    const [equipList, setEquipList] = useState([]);
 
-    useEffect(() => {
-        const getEquipments = async () => {
-            const { data } = await getEquips();
-            setEquipments(data);
-            setFilteredEquipments(data);
-            console.log(data);
-        }
-        getEquipments();
-    }, [])
+    // Voice Recognition Setup
+    const {
+        transcript,
+        listening,
+        resetTranscript,
+        browserSupportsSpeechRecognition
+    } = useSpeechRecognition();
 
-    useEffect(() => {
-        const getEquipmentsList = async () => {
-            const { data } = await getEquipsList();
-            // console.log(data, "list");
-            setEquipList(data);
-        }
-        getEquipmentsList();
-    }, []);
-
-
-    // useEffect(() => {
-    //     if(searchInput)
-    //         setFilteredEquipments(equipments?.filter(equipment => equipment?.title?.toLowerCase().includes(searchInput.toLowerCase())));
-    //     if(perDay)
-    //         setFilteredEquipments(equipments?.filter(equipment => equipment?.daily_rental<=(perDay)));
-    // }, [change]);
-
-    const handleFilter = (e) => {
-        setSearchInput(e.target.value);
-    }
+    // Date Range Selection
+    const [dateRange, setDateRange] = useState({
+        startDate: new Date(),
+        endDate: new Date(),
+        key: 'selection'
+    });
 
     const selectionRange = {
-        startDate: startDate,
-        endDate: endDate,
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate,
         key: 'selection'
-    }
-
-    const commands = [
-        {
-            command: ["search * item", "search *", "find * item", "find *"],
-            callback: (redirectPage) => setVoiceSearch(redirectPage),
-        },
-    ];
-
-    const { transcript } = useSpeechRecognition({ commands });
-    const [voiceSearch, setVoiceSearch] = useState("");
-
-    const pages = ["home", "dashboard", "booking", "contact", "tractor"];
-    const urls = {
-        home: "/",
-        blog: "/dashboard",
-        booking: "/booking",
-        contact: "/contact",
-        tractor: "/product/4",
     };
 
-    if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
-        return null;
-    }
-    console.log(voiceSearch, "voiceSearch");
+    // Handle date selection
+    const handleSelect = (ranges) => {
+        setDateRange(ranges.selection);
+    };
 
-    let redirect = "";
-
-    //   if (voiceSearch) {
-    //     searchInput=voiceSearch;
-    //   }
-    if (voiceSearch) {
-        if (pages.includes(voiceSearch)) {
-            //   if()
-            // const item = equipments?.filter(eq => (eq.title.toLowerCase().includes(voiceSearch.toLowerCase())));
-            // console.log(item, "filtered id");
-            setSearchInput(voiceSearch);
-            setVoiceSearch('');
-            redirect = <p>Searching: {voiceSearch}</p>;
-            //   setTimeout(() => {
-            //     redirect = window.location = `/product/${item[0]?.id}`;
-            //   }, 3000);
-        } else {
-            setSearchInput('');
-            setVoiceSearch('');
-            redirect = <p>Could not find page: {voiceSearch}</p>;
+    // Sample land listings data (you can move this to API)
+    const landListings = [
+        {
+            id: 1,
+            title: "Fertile Farmland",
+            location: "Karnataka",
+            area: "25 Acres",
+            daily_rental: 45000,
+            image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef"
+        },
+        {
+            id: 2,
+            title: "Paddy Fields",
+            location: "Punjab",
+            area: "30 Acres",
+            daily_rental: 38000,
+            image: "https://images.unsplash.com/photo-1589328956162-4e2f54b36881"
+        },
+        {
+            id: 3,
+            title: "Organic Farm Plot",
+            location: "Maharashtra",
+            area: "20 Acres",
+            daily_rental: 42000,
+            image: "https://images.unsplash.com/photo-1464226184884-fa280b87c399"
         }
-    }
+        // Add more land listings as needed
+    ];
 
+    // Enhanced sample equipment data with detailed Indian agricultural context
+    const sampleEquipments = [
+        {
+            id: 1,
+            title: "Mahindra 575 DI Tractor",
+            location: "Ludhiana, Punjab",
+            daily_rental: 2500,
+            image: "https://images.unsplash.com/photo-1605338198618-d6c99f5a5e96?q=80",
+            specifications: {
+                model: "575 DI XP Plus",
+                horsepower: "47 HP",
+                condition: "Excellent"
+            },
+            owner: "Singh Agro Services",
+            rating: 4.8,
+            reviews: 156,
+            available: true,
+            featured: true
+        },
+        {
+            id: 2,
+            title: "Swaraj 744 FE Tractor",
+            location: "Karnal, Haryana",
+            daily_rental: 2200,
+            image: "https://images.unsplash.com/photo-1589328956162-4e2f54b36881?q=80",
+            specifications: {
+                model: "744 FE",
+                horsepower: "44 HP",
+                condition: "Good"
+            },
+            owner: "Haryana Tractors",
+            rating: 4.6,
+            reviews: 98,
+            available: true,
+            featured: false
+        },
+        {
+            id: 3,
+            title: "New Holland Combine Harvester",
+            location: "Bathinda, Punjab",
+            daily_rental: 15000,
+            image: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80",
+            specifications: {
+                model: "TC5.30",
+                width: "14 feet",
+                condition: "Excellent"
+            },
+            owner: "Modern Agro Equipment",
+            rating: 4.9,
+            reviews: 87,
+            available: true,
+            featured: true
+        },
+        {
+            id: 4,
+            title: "Sonalika Rotavator",
+            location: "Nashik, Maharashtra",
+            daily_rental: 1200,
+            image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80",
+            specifications: {
+                width: "7 feet",
+                blades: "48",
+                condition: "New"
+            },
+            owner: "Maharashtra Agro Tools",
+            rating: 4.5,
+            reviews: 45,
+            available: true,
+            featured: false
+        },
+        {
+            id: 5,
+            title: "John Deere Seed Drill",
+            location: "Guntur, Andhra Pradesh",
+            daily_rental: 1800,
+            image: "https://images.unsplash.com/photo-1589328956162-4e2f54b36881?q=80",
+            specifications: {
+                rows: "15",
+                type: "Zero Till",
+                condition: "Good"
+            },
+            owner: "AP Agri Solutions",
+            rating: 4.7,
+            reviews: 67,
+            available: true,
+            featured: false
+        },
+        {
+            id: 6,
+            title: "Massey Ferguson Laser Leveler",
+            location: "Meerut, Uttar Pradesh",
+            daily_rental: 3500,
+            image: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80",
+            specifications: {
+                accuracy: "±2mm",
+                range: "1000m",
+                condition: "Excellent"
+            },
+            owner: "UP Farm Equipment",
+            rating: 4.8,
+            reviews: 92,
+            available: true,
+            featured: true
+        },
+        {
+            id: 7,
+            title: "VST Power Weeder",
+            location: "Coimbatore, Tamil Nadu",
+            daily_rental: 800,
+            image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80",
+            specifications: {
+                engine: "160cc",
+                width: "600mm",
+                condition: "Good"
+            },
+            owner: "TN Agro Services",
+            rating: 4.4,
+            reviews: 34,
+            available: true,
+            featured: false
+        },
+        {
+            id: 8,
+            title: "Kubota Rice Transplanter",
+            location: "Raipur, Chhattisgarh",
+            daily_rental: 4500,
+            image: "https://images.unsplash.com/photo-1589328956162-4e2f54b36881?q=80",
+            specifications: {
+                rows: "8",
+                type: "Riding",
+                condition: "Excellent"
+            },
+            owner: "Chhattisgarh Agri Tools",
+            rating: 4.9,
+            reviews: 78,
+            available: true,
+            featured: true
+        },
+        {
+            id: 9,
+            title: "TAFE Sprayer",
+            location: "Belgaum, Karnataka",
+            daily_rental: 900,
+            image: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80",
+            specifications: {
+                capacity: "400L",
+                type: "Boom",
+                condition: "Good"
+            },
+            owner: "Karnataka Farm Solutions",
+            rating: 4.6,
+            reviews: 52,
+            available: true,
+            featured: false
+        }
+    ];
 
+    // Enhanced Equipment Card Component
+    const EquipmentCard = ({ equipment }) => (
+        <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
+            {/* Image Container */}
+            <div className="relative">
+                <img 
+                    src={equipment.image} 
+                    alt={equipment.title}
+                    className="w-full h-56 object-cover transform group-hover:scale-105 transition-transform duration-300"
+                />
+                {equipment.featured && (
+                    <div className="absolute top-4 left-4">
+                        <span className="bg-yellow-400 text-gray-900 px-3 py-1 rounded-full text-sm font-medium flex items-center">
+                            <FaStar className="mr-1" /> Featured
+                        </span>
+                    </div>
+                )}
+                {equipment.available && (
+                    <span className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                        Available Now
+                    </span>
+                )}
+            </div>
+
+            {/* Content Container */}
+            <div className="p-6">
+                {/* Header */}
+                <div className="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">
+                            {equipment.title}
+                        </h3>
+                        <div className="flex items-center text-gray-600">
+                            <FaMapMarkerAlt className="mr-2 text-green-600" />
+                            <span>{equipment.location}</span>
+                        </div>
+                    </div>
+                    <div className="flex items-center bg-green-50 px-3 py-1 rounded-lg">
+                        <FaStar className="text-yellow-400 mr-1" />
+                        <span className="font-semibold text-green-700">{equipment.rating}</span>
+                        <span className="text-gray-500 text-sm ml-1">({equipment.reviews})</span>
+                    </div>
+                </div>
+
+                {/* Specifications */}
+                <div className="bg-gray-50 rounded-xl p-4 mb-4">
+                    <h4 className="text-sm font-semibold text-gray-700 mb-3">Specifications</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                        {Object.entries(equipment.specifications).map(([key, value]) => (
+                            <div key={key} className="flex items-center text-sm">
+                                <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                                <span className="text-gray-600 capitalize">{key}:</span>
+                                <span className="ml-1 font-medium text-gray-900">{value}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Owner Info */}
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                            <MdVerified className="text-green-600 text-xl" />
+                        </div>
+                        <div>
+                            <p className="text-sm text-gray-900 font-medium">{equipment.owner}</p>
+                            <p className="text-xs text-gray-500">Verified Seller</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Price and Action */}
+                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <div>
+                        <div className="text-green-600 font-bold text-xl">
+                            ₹{equipment.daily_rental.toLocaleString()}/day
+                        </div>
+                        <div className="text-gray-500 text-sm flex items-center">
+                            <FaCalendarAlt className="mr-1" /> Immediate Booking
+                        </div>
+                    </div>
+                    <button className="bg-green-600 text-white px-6 py-2.5 rounded-lg hover:bg-green-700 transition-colors flex items-center group">
+                        Book Now
+                        <BsArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+
+    // ... keeping all existing useEffect hooks ...
+
+    useEffect(() => {
+        if (transcript) {
+            setSearchInput(transcript);
+        }
+    }, [transcript]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const equipmentsData = await getEquips();
+                const equipListData = await getEquipsList();
+                setEquipments(equipmentsData.length ? equipmentsData : sampleEquipments);
+                setEquipList(equipListData);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                setEquipments(sampleEquipments); // Fallback to sample data
+            }
+        };
+        fetchData();
+    }, [change]);
 
     return (
-        <>
-            {redirect}
-            {/* <p id="transcript">Transcript: {transcript}</p> */}
-
-            {/* <button onClick={SpeechRecognition.startListening}>Start</button> */}
-            {/* <div className='h-4 w-full my-4 bg-[#D8F5DE]'></div> */}
-            <div className='max-w-7xl my-10 mx-auto'>
-                <div className='mt-4'>
-                    <div className='flex justify-around'>
-                        <h1 className='text-2xl font-bold text-gray-600 text-right'>Search Equipments</h1>
-                        <div className=''>
-                            <div className="input-group relative flex items-center w-full mb-4">
-                                <i onClick={SpeechRecognition.startListening} className="text-darkgreen tooltip cursor-pointer text-2xl mr-5 fa-solid fa-microphone"><span className="tooltiptext">Search by Voice</span></i>
-
-                                <input onChange={(e) => handleFilter(e)} value={searchInput} type="search" className="searchInput form-control relative flex-auto min-w-0 block w-full px-3 py-3 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" placeholder="Enter your Equipment here......" aria-label="Search" aria-describedby="button-addon3" />
-                                <button className="searchBtn btn inline-block px-6 py-2 text-green-600 font-medium text-sm leading-tight uppercase rounded hover:bg-black hover:bg-opacity-5 cursor-pointer focus:outline-none focus:ring-0 transition duration-150 ease-in-out" type="button" id="button-addon3">Search</button>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div className='flex mb-10 justify-around'>
-                        <div className="flex w-[240px] h-[40px] items-center border-2 rounded-lg border-[#68AC5D] px-1">
-                            <i className="text-[#68AC5D] pl-4 pr-2 fa-solid fa-location-dot"></i>
-                            <input className="searchDash appearance-none bg-transparent w-full text-gray-800 font-semibold mr-1 py-0.5 px-1 leading-tight focus:outline-none" type="text" placeholder="Enter Pincode (eg 201301)" aria-label="Full name" />
-                        </div>
-                        <h1 className='mt-3 mb-3 text-md font-semibold text-gray-500 text-center'>Search your desired Equipments directly by entering a keyword or the whole name.</h1>
+        <div className="min-h-screen bg-gray-50">
+            {/* Hero Section with Enhanced Design */}
+            <div className="bg-gradient-to-r from-green-600 via-green-500 to-green-600 py-8">
+                <div className="max-w-full  px-4 sm:px-6 lg:px-4">
+                    <div className="text-center mb-12">
+                        <h1 className="text-5xl font-bold text-white mb-6">
+                            Krishi Mart Marketplace
+                        </h1>
+                        <p className="text-xl text-green-50 max-w-2xl mx-auto">
+                            India's largest platform for agricultural equipment rentals and land leasing
+                        </p>
                     </div>
 
-                    <div className='flex justify-around w-full'>
-                        <div className='w-1/4'>
-                            <div className='bg-[#68AC5D] py-4 px-1 prFilter'>
-                                <h1 className='text-lg font-bold text-center text-white'>Product Filters</h1>
-
+                    {/* Enhanced Search Bar */}
+                    <div className="max-w-7xl mx-auto">
+                        <div className="flex items-center bg-white rounded-xl shadow-lg p-2">
+                            <div className="flex-1 flex items-center">
+                                <FaSearch className="text-gray-400 ml-4 text-xl" />
+                                <input
+                                    type="search"
+                                    className="w-full px-4 py-3 outline-none text-lg"
+                                    placeholder="Search for equipment or land..."
+                                    value={searchInput}
+                                    onChange={(e) => {setSearchInput(e.target.value); setChange(!change)}}
+                                />
                             </div>
-
-
-                            <div className='border py-6'>
-                                <span className='text-lg mb-4 font-semibold text-[#4F4F4F] border-b-2 border-[#68AC5D] pb-1 ml-6'>Categories:</span>
-
-                                <div className='my-5'>
-                                    {
-                                        equipList?.map(list => (
-                                            <Dropdown key={list.id} title={list.name} />
-                                        ))
-                                    }
-                                </div>
-
-                                <span className='text-lg mb-4 font-semibold text-[#4F4F4F] border-b-2 border-[#68AC5D] pb-1 ml-6'>Brands</span>
-
-                                <div className='my-5'>
-                                    <Dropdown title="Mahindra" />
-                                    <Dropdown title="John Deere" />
-                                    <Dropdown title="CLAAS India" />
-                                </div>
-
-                                <span className='text-lg mb-4 font-semibold text-[#4F4F4F] border-b-2 border-[#68AC5D] pb-1 ml-6'>Price Range</span>
-
-                                <div className='my-5'>
-                                    <p className='text-md font-semibold text-[#4F4F4F] pl-8'>Price per day</p>
-                                    <input type="range" id="perDay" min={0} max={149827} onChange={(e) => { setPerDay(e.target.value); setChange(!change) }} value={perDay}
-                                        className="rangeInput form-range text-green-100 appearance-none w-full h-6 p-0 bg-transparent focus:outline-none focus:ring-0 focus:shadow-none"
-                                    />
-                                    <p className='text-md mb-3 font-normal text-[#4F4F4F] pl-8'>Rs. 0 to {perDay} </p>
-
-                                    <p className='text-md font-semibold text-[#4F4F4F] pl-8'>Price per hour</p>
-                                    <input type="range" id="customRange1" min={42} max={49827} onChange={(e) => { setPerHour(e.target.value); setChange(!change) }} value={perHour}
-                                        className="rangeInput form-range text-green-100 appearance-none w-full h-6 p-0 bg-transparent focus:outline-none focus:ring-0 focus:shadow-none"
-                                    />
-                                    <p className='text-md mb-3 font-normal text-[#4F4F4F] pl-8'>Rs. 42 to {perHour}</p>
-
-                                    <p className='text-md font-semibold text-[#4F4F4F] pl-8'>Distance from You</p>
-                                    <input type="range" id="customRange1" min={0} max={6.6} onChange={(e) => { setDistance(e.target.value); setChange(!change) }} value={distance}
-                                        className="rangeInput form-range text-green-100 appearance-none w-full h-6 p-0 bg-transparent focus:outline-none focus:ring-0 focus:shadow-none"
-                                    />
-                                    <p className='text-md font-normal text-[#4F4F4F] pl-8'>0 KM to {distance} KM</p>
-                                </div>
-
-                                <span className='text-lg mb-4 font-semibold text-[#4F4F4F] border-b-2 border-[#68AC5D] pb-1 ml-6'>Availability Date</span>
-
-                                <p className='text-md pt-2 font-normal text-[#4F4F4F] pl-6'>From</p>
-
-                                <div className='flex justify-center items-center'>
-                                    <button onClick={() => setVisible1(!visible1)} className="bg-darkgreen hover:bg-green-700 text-white font-normal text-sm py-1 text-center w-1/2 my-4 px-2 rounded">
-                                        DD-MM-YYYY
-                                    </button>
-                                    <i className="ml-4 text-lg text-[#68AC5D] fa-solid fa-calendar"></i>
-                                </div>
-                                <div style={{ display: visible1 ? 'block' : 'none', height: '400px', width: '200px', 'zIndex': 1 }}>
-                                    <DateRangePicker style={{ height: '300px', width: '280px' }}
-                                        ranges={[selectionRange]}
-                                        minDate={new Date()}
-                                        // disabledDates={getDaysArray(new Date(),new Date())}
-                                        rangeColors={["#68AC5D"]}
-                                    // onChange={handleSelect}
-                                    // maxDate={new Date()}
-                                    />
-                                </div>
-
-
-                                <p className='text-md font-normal text-[#4F4F4F] pl-6'>To</p>
-                                <div className='flex justify-center items-center'>
-                                    <button onClick={() => setVisible2(!visible2)} className="bg-darkgreen hover:bg-green-700 text-white font-normal text-sm py-1 text-center w-1/2 my-4 px-2 rounded">
-                                        DD-MM-YYYY
-                                    </button>
-                                    <i className="ml-4 text-lg text-[#68AC5D] fa-solid fa-calendar"></i>
-                                </div>
-                                <div style={{ display: visible2 ? 'block' : 'none', height: '400px', width: '200px', 'zIndex': 1 }}>
-                                    <DateRangePicker style={{ height: '300px', width: '280px' }}
-                                        ranges={[selectionRange]}
-                                        minDate={new Date()}
-                                        // disabledDates={getDaysArray(new Date(),new Date())}
-                                        rangeColors={["#68AC5D"]}
-                                    // onChange={handleSelect}
-                                    // maxDate={new Date()}
-                                    />
-                                </div>
-
-                            </div>
-
-                            {/* <div className='w-11/12'>
-                                <div className='bg-[#68AC5D] -mt-5 py-4 ml-10 px-1 prFilter'>
-                                    <h1 className='text-lg font-bold text-center text-white'>Set Date</h1>
-                                </div>
-                            </div> */}
-
-
-
-                        </div>
-
-                        <div className='w-3/4 ml-8'>
-                            <div className='relative flex justify-around'>
-                                <h1 className='absolute top-0 left-0 text-2xl font-bold text-gray-600'>Featured Products</h1>
-                                <button className="absolute top-0 right-10 shadow-md bg-darkgreen mx-auto hover:bg-green-700 text-white text-md font-normal py-1.5 px-3 rounded">
-                                    More <i className="pl-1 w-5 fa-solid fa-angle-right"></i>
-                                </button>
-                            </div>
-
-                            <div className='flex flex-wrap items-center'>
-                                <div className='flex flex-wrap my-12'>
-                                    {
-                                        equipments?.filter(equipment => equipment?.title?.toLowerCase().includes(searchInput.toLowerCase()))?.map(equipment => (
-                                            <ProductItem key={equipment.id} equipment={equipment} />
-                                        ))
-                                        // equipments?.map(equipment => (
-                                        //     <ProductItem key={equipment.id} equipment={equipment} />
-                                        // ))
-                                    }
-                                    {/* {
-                                        filteredEquipments?.map(equipment => (
-                                            <ProductItem key={equipment.id} equipment={equipment} />
-                                        ))
-                                    } */}
-                                    {/* {
-                                        equipments?.filter(equipment => equipment?.daily_rental<=(perDay))?.map(equipment => (
-                                            <ProductItem key={equipment.id} equipment={equipment} />
-                                        ))
-                                    } */}
-                                </div>
-                            </div>
-
-                            <div className='relative flex justify-around'>
-                                <h1 className='absolute top-0 left-0 text-2xl font-bold text-gray-600'>All Products</h1>
-                                <a className='absolute top-0 right-10 mx-auto hover:bg-green-700 text-green-600 text-sm font-normal'>View All</a>
-                            </div>
-
-                            <div className='flex flex-wrap items-center'>
-                                <div className='flex flex-wrap my-12'>
-                                    {
-                                        !searchInput ? (
-                                            equipments?.map(equipment => (
-                                                <ProductItem key={equipment.id} equipment={equipment} />
-                                            ))
-                                        ) : (
-                                            equipments?.filter(equipment => equipment?.title?.toLowerCase().includes(searchInput.toLowerCase()))?.map(equipment => (
-                                                <ProductItem key={equipment.id} equipment={equipment} />
-                                            ))
-                                        )
-                                    }
-                                </div>
-                            </div>
-
-
+                            <button 
+                                onClick={SpeechRecognition.startListening}
+                                className="p-3 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-colors"
+                                title="Voice Search"
+                            >
+                                <FaMicrophone className="w-5 h-5" />
+                            </button>
+                            <button className="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-colors ml-2 font-medium">
+                                Search
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-        </>
-    )
-}
 
-export default Dashboard
+            {/* Main Content Area */}
+            <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                {/* Enhanced Tabs */}
+                <div className="flex justify-center mb-12">
+                    <div className="bg-white rounded-xl shadow-sm p-2 inline-flex">
+                        <button
+                            className={`px-8 py-3 rounded-lg transition-all duration-300 flex items-center ${
+                                activeTab === 'equipment' 
+                                    ? 'bg-green-600 text-white shadow-md' 
+                                    : 'text-gray-600 hover:bg-gray-50'
+                            }`}
+                            onClick={() => setActiveTab('equipment')}
+                        >
+                            <FaTractor className={`mr-2 ${activeTab === 'equipment' ? 'text-white' : 'text-green-600'}`} />
+                            Equipment Rental
+                        </button>
+                        <button
+                            className={`px-8 py-3 rounded-lg transition-all duration-300 flex items-center ml-2 ${
+                                activeTab === 'land' 
+                                    ? 'bg-green-600 text-white shadow-md' 
+                                    : 'text-gray-600 hover:bg-gray-50'
+                            }`}
+                            onClick={() => setActiveTab('land')}
+                        >
+                            <MdAgriculture className={`mr-2 ${activeTab === 'land' ? 'text-white' : 'text-green-600'}`} />
+                            Land Leasing
+                        </button>
+                    </div>
+                </div>
+
+                <div className="flex gap-8">
+                    {/* Filters Sidebar */}
+                    <div className="hidden md:block w-64 bg-white rounded-lg shadow-sm p-6">
+                        <div className="mb-6">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <FaFilter className="mr-2" />
+                                Filters
+                            </h3>
+                            
+                            {/* Categories */}
+                            <div className="mb-6">
+                                <h4 className="font-medium text-gray-900 mb-2">Categories</h4>
+                                {equipList?.map(list => (
+                                    <Dropdown key={list.id} title={list.name} />
+                                ))}
+                            </div>
+
+                            {/* Price Range */}
+                            <div className="mb-6">
+                                <h4 className="font-medium text-gray-900 mb-2">Price Range</h4>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="text-sm text-gray-600">Price per day</label>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="150000"
+                                            value={perDay}
+                                            onChange={(e) => {setPerDay(e.target.value); setChange(!change)}}
+                                            className="w-full h-2 bg-green-200 rounded-lg appearance-none cursor-pointer"
+                                        />
+                                        <div className="flex justify-between text-sm text-gray-600">
+                                            <span>₹0</span>
+                                            <span>₹{perDay}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Date Range */}
+                            <div className="mb-6">
+                                <h4 className="font-medium text-gray-900 mb-2">Availability</h4>
+                                <button 
+                                    onClick={() => setVisible1(!visible1)}
+                                    className="w-full px-4 py-2 text-sm bg-green-50 text-green-600 rounded-lg hover:bg-green-100"
+                                >
+                                    Select Dates
+                                </button>
+                                {visible1 && (
+                                    <div className="absolute z-10 mt-2">
+                                        <DateRangePicker
+                                            ranges={[selectionRange]}
+                                            minDate={new Date()}
+                                            rangeColors={["#16a34a"]}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Main Content Area */}
+                    <div className="flex-1">
+                        {/* Results Grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {activeTab === 'equipment' ? (
+                                // Equipment Cards
+                                equipments
+                                    ?.filter(equipment => 
+                                        equipment?.title?.toLowerCase().includes(searchInput.toLowerCase()) &&
+                                        equipment?.daily_rental <= perDay
+                                    )
+                                    .map(equipment => (
+                                        <EquipmentCard key={equipment.id} equipment={equipment} />
+                                    ))
+                            ) : (
+                                // Land Listing Cards
+                                landListings
+                                    .filter(land => 
+                                        land?.title?.toLowerCase().includes(searchInput.toLowerCase()) &&
+                                        land?.daily_rental <= perDay
+                                    )
+                                    .map(land => (
+                                        <div key={land.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                                            <img 
+                                                src={land.image} 
+                                                alt={land.title}
+                                                className="w-full h-48 object-cover"
+                                            />
+                                            <div className="p-4">
+                                                <h3 className="text-lg font-semibold text-gray-900">{land.title}</h3>
+                                                <div className="flex items-center text-gray-600 mt-2">
+                                                    <FaMapMarkerAlt className="mr-1" />
+                                                    <span>{land.location}</span>
+                                                </div>
+                                                <div className="flex items-center justify-between mt-4">
+                                                    <div className="text-green-600 font-semibold">
+                                                        <FaRupeeSign className="inline" />
+                                                        {land.daily_rental}/acre
+                                                    </div>
+                                                    <button className="px-4 py-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200">
+                                                        View Details
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default Dashboard;

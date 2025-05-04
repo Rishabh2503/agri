@@ -51,7 +51,6 @@
     margin: 10%;
     background-color: #68AC5D !important;
 }
-
 .rangeInput::-webkit-slider-thumb {
     -webkit-appearance: none !important;
     appearance: none !important;
@@ -60,23 +59,22 @@
     background: #FFFFFF !important;
     cursor: pointer;
     border-radius: 50%;
-}
-
-.rangeInput::-moz-range-thumb {
+  }
+  
+  .rangeInput::-moz-range-thumb {
     width: 10px;
     height: 10px;
     background: #FFFFFF !important;
     cursor: pointer;
     border-radius: 50%;
-}
+  }
 
 .searchDash::placeholder {
     font-weight: 600;
     color: #524d4d;
 }
 
-.rdrDefinedRangesWrapper,
-.rdrCalendarWrapper {
+.rdrDefinedRangesWrapper, .rdrCalendarWrapper {
     z-index: 1;
 }
 
@@ -85,9 +83,9 @@
     position: relative;
     display: inline-block;
     /* border-bottom: 1px dotted black; */
-}
-
-.tooltip .tooltiptext {
+  }
+  
+  .tooltip .tooltiptext {
     visibility: hidden;
     width: 160px;
     height: 30px;
@@ -104,12 +102,12 @@
     padding-top: 1px;
     word-spacing: 4px;
     letter-spacing: 1px;
-
+  
     /* Position the tooltip */
     position: absolute;
     z-index: 1;
-}
-
-.tooltip:hover .tooltiptext {
+  }
+  
+  .tooltip:hover .tooltiptext {
     visibility: visible;
-}
+  }
