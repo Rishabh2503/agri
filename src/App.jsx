@@ -19,7 +19,6 @@ import PreHeader from './components/preheader/PreHeader';
 const Home = lazy(() => import('./pages/Home/Home'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
-const Activate = lazy(() => import('./pages/Activate'));
 const Profile = lazy(() => import('./pages/Profile'));
 
 // Protected route component

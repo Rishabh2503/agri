@@ -4,8 +4,9 @@ import {
     loginUser,
     registerUser,
     activateUser,
-    logoutUser,
+    logoutUser
 } from '../services/authService';
+import {getUserInfo } from '../services/useService';
 import React from 'react';
 
 export const AuthContext = createContext();
@@ -48,6 +49,23 @@ export const AuthProvider = ({ children }) => {
             setLoading(false);
         }
     };
+
+    // Function to fetch user info
+    const getUser = async () => {
+        try {
+            setLoading(true);  // Start loading
+            const data = await getUserInfo();  // Call the getUserInfo function from authService
+            setUser(data);  // Set the user data
+            setLoading(false);  // End loading
+        } catch (err) {
+            setError(err.message || 'Error fetching user data');  // Handle error if any
+            setLoading(false);  // End loading
+        }
+    };
+
+    useEffect(() => {
+        getUser(); // Fetch user info on initial load
+    }, []);  // The empty dependency array ensures this runs only once when the component mounts
 
     const register = async (userData) => {
         setLoading(true);
@@ -103,6 +121,7 @@ export const AuthProvider = ({ children }) => {
         register,
         activate,
         logout,
+        getUser  // Providing getUser to the context
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
