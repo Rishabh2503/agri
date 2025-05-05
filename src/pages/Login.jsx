@@ -12,26 +12,15 @@ const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-    });
-
+    const [formData, setFormData] = useState({ email: '', password: '' });
     const [errors, setErrors] = useState({});
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
+        setFormData((prev) => ({ ...prev, [name]: value }));
 
-        // Clear error when user starts typing
         if (errors[name]) {
-            setErrors((prev) => ({
-                ...prev,
-                [name]: '',
-            }));
+            setErrors((prev) => ({ ...prev, [name]: '' }));
         }
     };
 
@@ -59,12 +48,14 @@ const Login = () => {
 
         if (!validateForm()) return;
 
-        const success = await login(formData.email, formData.password);
-
-        if (success) {
-            // Get the redirect path from location state or default to home
-            const from = location.state?.from?.pathname || '/';
-            navigate(from, { replace: true });
+        try {
+            const success = await login(formData.email, formData.password);
+            if (success) {
+                const from = location.state?.from?.pathname || '/';
+                navigate(from, { replace: true });
+            }
+        } catch (err) {
+            console.error('Login failed:', err);
         }
     };
 
@@ -74,7 +65,7 @@ const Login = () => {
                 {t('login.title')}
             </h2>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} noValidate>
                 <Input
                     id="email"
                     name="email"
@@ -84,9 +75,8 @@ const Login = () => {
                     value={formData.email}
                     onChange={handleChange}
                     error={errors.email}
-                    required
                     leftIcon={
-                        <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                             <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                         </svg>
@@ -102,9 +92,8 @@ const Login = () => {
                     value={formData.password}
                     onChange={handleChange}
                     error={errors.password}
-                    required
                     leftIcon={
-                        <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                         </svg>
                     }
@@ -127,25 +116,19 @@ const Login = () => {
                             name="remember-me"
                             type="checkbox"
                             className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                            aria-label="Remember me"
                         />
-                        <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                        <label htmlFor="remember-me" className="ml-2 text-sm text-gray-700">
                             {t('login.rememberMe')}
                         </label>
                     </div>
 
-                    <div className="text-sm">
-                        <Link to="/forgot-password" className="text-green-600 hover:text-green-500">
-                            {t('login.forgotPassword')}
-                        </Link>
-                    </div>
+                    <Link to="/forgot-password" className="text-sm text-green-600 hover:text-green-500">
+                        {t('login.forgotPassword')}
+                    </Link>
                 </div>
 
-                <Button
-                    type="submit"
-                    variant="primary"
-                    className="w-full"
-                    isLoading={loading}
-                >
+                <Button type="submit" variant="primary" className="w-full" isLoading={loading}>
                     {t('login.signIn')}
                 </Button>
             </form>
