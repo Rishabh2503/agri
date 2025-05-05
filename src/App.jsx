@@ -13,7 +13,7 @@ import CropPrediction from './pages/cropPrediction/cropPrediciton';
 import Dashboard from './pages/dashboard/Dashboard';
 import Chat from './pages/chat/Chat';
 import MainLayout from './components/layout/MainLayout';
-import UserActivation from'./pages/UserActivation';
+import UserActivation from './pages/UserActivation';
 
 
 // Lazy-loaded pages
