@@ -1,13 +1,13 @@
 // src/utils/localStorage.js
 export const getStoredAuth = () => {
-    const auth = localStorage.getItem('krishimart_auth');
-    return auth ? JSON.parse(auth) : null;
+  const auth = localStorage.getItem('krishimart_auth');
+  return auth ? JSON.parse(auth) : null;
 };
 
-export const setStoredAuth = (authData) => {
-    localStorage.setItem('krishimart_auth', JSON.stringify(authData));
+export const setStoredAuth = (auth) => {
+  localStorage.setItem('auth', JSON.stringify(auth));
 };
 
 export const removeStoredAuth = () => {
-    localStorage.removeItem('krishimart_auth');
+  localStorage.removeItem('krishimart_auth');
 };
