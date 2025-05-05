@@ -11,6 +11,8 @@ import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaEdit } from 'react-icons
 const Profile = () => {
   const { t } = useTranslation();
   const { user, updateProfile, loading, error, getUser } = useAuth();
+
+  console.log("userauthprofile", user);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({

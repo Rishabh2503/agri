@@ -55,11 +55,11 @@ function App() {
             } />
           </Route>
 
-          <Route path="/" element={<AuthLayout />}>
-            <Route path="login" element={<Login />} />
-            <Route path="register" element={<Register />} />
-            <Route path="activation/:activation_token" element={<UserActivation />} />
-          </Route>
+          <Route element={<AuthLayout />}>
+    <Route path="/login" element={<Login />} />
+    <Route path="/register" element={<Register />} />
+    <Route path="/activation/:activation_token" element={<UserActivation />} />
+  </Route>
         </Routes>
         <Footer />
       </Suspense>
