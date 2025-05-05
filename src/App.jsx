@@ -13,8 +13,7 @@ import CropPrediction from './pages/cropPrediction/cropPrediciton';
 import Dashboard from './pages/dashboard/Dashboard';
 import Chat from './pages/chat/Chat';
 import MainLayout from './components/layout/MainLayout';
-import UserActivation from './pages/UserActivation';
-
+import PreHeader from './components/preheader/PreHeader';
 
 // Lazy-loaded pages
 const Home = lazy(() => import('./pages/Home/Home'));
@@ -27,7 +26,12 @@ const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return (
+      <Navigate
+        to='/login'
+        replace
+      />
+    );
   }
 
   return children;
@@ -37,24 +41,53 @@ function App() {
   return (
     <CropProvider>
       <Suspense fallback={<Loader />}>
+        {/* <PreHeader /> */}
         <Routes>
-          <Route path="/" element={<MainLayout />}>
-            <Route index element={<Home />} />
-            <Route path="/land-leasing" element={<LandLeasing />} />
-            <Route path="/land-leasing/:id" element={<LandLeasingDetails />} />
-            <Route path="/rental-equipment" element={<RentalEquipment />} />
-            <Route path="/rental-equipment/:id" element={<RentalEquipmentDetails />} />
-            <Route path="/crop-prediction" element={<CropPrediction />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+          <Route
+            path='/'
+            element={<MainLayout />}>
+            <Route
+              index
+              element={<Home />}
+            />
+            <Route
+              path='/land-leasing'
+              element={<LandLeasing />}
+            />
+            <Route
+              path='/land-leasing/:id'
+              element={<LandLeasingDetails />}
+            />
+            <Route
+              path='/rental-equipment'
+              element={<RentalEquipment />}
+            />
+            <Route
+              path='/rental-equipment/:id'
+              element={<RentalEquipmentDetails />}
+            />
+            <Route
+              path='/crop-prediction'
+              element={<CropPrediction />}
+            />
+            <Route
+              path='/dashboard'
+              element={<Dashboard />}
+            />
             {/* <Route path="/add-product" element={<AddProduct />} /> */}
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } />
+            <Route
+              path='/chat'
+              element={<Chat />}
+            />
+            <Route
+              path='/profile'
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
           </Route>
-
           <Route element={<AuthLayout />}>
     <Route path="/login" element={<Login />} />
     <Route path="/register" element={<Register />} />
