@@ -2,27 +2,55 @@ import axios from 'axios';
 
 const API_URL = 'https://krishimart-back.onrender.com/api/v2';
 
-// Create an Axios instance with base config
 const axiosInstance = axios.create({
   baseURL: API_URL,
-  withCredentials: true, // ✅ Enables sending cookies/session across domains
+  withCredentials: true
 });
 
-// Login user (uses JSON content type)
+// Add interceptor to add token to requests
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export const loginUser = async (email, password) => {
   try {
-    const response = await axiosInstance.post(
-      '/user/login-user',
-      { email, password },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await axiosInstance.post('/user/login-user', {
+      email,
+      password
+    });
+
+    if (response.data.token) {
+      // Store token and user data
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
+
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Login failed');
+  }
+};
+
+export const getCurrentUser = async () => {
+  try {
+    const response = await axiosInstance.get('/user/getuser'); // Changed from /user/me to /user/getuser
+    return response.data;
+  } catch (error) {
+    // If unauthorized, clear storage
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
+    throw new Error(error.response?.data?.message || 'Failed to get user');
   }
 };
 
@@ -31,8 +59,8 @@ export const registerUser = async (userData) => {
   try {
     const response = await axiosInstance.post('/user/create-user', userData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+        'Content-Type': 'multipart/form-data'
+      }
     });
     return response.data;
   } catch (error) {
@@ -48,8 +76,8 @@ export const activateUser = async (activationToken) => {
       { activation_token: activationToken },
       {
         headers: {
-          'Content-Type': 'application/json',
-        },
+          'Content-Type': 'application/json'
+        }
       }
     );
     return response.data;
@@ -58,12 +86,11 @@ export const activateUser = async (activationToken) => {
   }
 };
 
-// Logout user
 export const logoutUser = async () => {
   try {
-    const response = await axiosInstance.get('/user/logout');
-    return response.data;
-  } catch (error) {
-    throw new Error(error.response?.data?.message || 'Logout failed');
+    await axiosInstance.get('/user/logout');
+  } finally {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
   }
 };

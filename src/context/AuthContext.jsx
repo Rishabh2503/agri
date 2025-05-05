@@ -1,128 +1,70 @@
-import { createContext, useState, useEffect } from 'react';
-import { getStoredAuth, setStoredAuth, removeStoredAuth } from '../utils/localStorage';
-import {
-    loginUser,
-    registerUser,
-    activateUser,
-    logoutUser
-} from '../services/authService';
-import {getUserInfo } from '../services/useService';
-import React from 'react';
+import React, { createContext, useState, useEffect } from 'react';
+import { loginUser, getCurrentUser, logoutUser } from '../services/authService';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [token, setToken] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const storedAuth = getStoredAuth();
-        if (storedAuth) {
-            setUser(storedAuth.user);
-            setToken(storedAuth.token);
-        }
-        setLoading(false);
-    }, []);
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
-    const login = async (email, password) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await loginUser(email, password);
-            const { success, user, token } = response;
+  const checkAuth = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const userData = await getCurrentUser();
+        setUser(userData.user || userData); // Handle both response formats
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      // Clear auth state if token is invalid
+      setUser(null);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            if (success && user && token) {
-                setUser(user);
-                setToken(token);
-                setStoredAuth({ user, token });
-                return true;
-            }
+  const login = async (email, password) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await loginUser(email, password);
+      setUser(response.user);
+      return response;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            setError('Invalid login credentials');
-            return false;
-        } catch (err) {
-            setError(err.message || 'Login failed');
-            return false;
-        } finally {
-            setLoading(false);
-        }
-    };
+  const logout = async () => {
+    try {
+      await logoutUser();
+    } catch (err) {
+      console.error('Logout failed:', err);
+    } finally {
+      setUser(null);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
+  };
 
-    // Function to fetch user info
-    const getUser = async () => {
-        try {
-            setLoading(true);  // Start loading
-            const data = await getUserInfo();  // Call the getUserInfo function from authService
-            setUser(data);  // Set the user data
-            setLoading(false);  // End loading
-        } catch (err) {
-            setError(err.message || 'Error fetching user data');  // Handle error if any
-            setLoading(false);  // End loading
-        }
-    };
+  const value = {
+    user,
+    loading,
+    error,
+    login,
+    logout,
+    isAuthenticated: !!user
+  };
 
-    useEffect(() => {
-        getUser(); // Fetch user info on initial load
-    }, []);  // The empty dependency array ensures this runs only once when the component mounts
-
-    const register = async (userData) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await registerUser(userData);
-            return response.success;
-        } catch (err) {
-            setError(err.message || 'Registration failed');
-            return false;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const activate = async (activationToken) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await activateUser(activationToken);
-            return response.success;
-        } catch (err) {
-            setError(err.message || 'Activation failed');
-            return false;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const logout = async () => {
-        setLoading(true);
-        try {
-            await logoutUser();
-            setUser(null);
-            setToken(null);
-            removeStoredAuth();
-            return true;
-        } catch (err) {
-            setError(err.message || 'Logout failed');
-            return false;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const value = {
-        user,
-        token,
-        isAuthenticated: !!token,
-        loading,
-        error,
-        login,
-        register,
-        activate,
-        logout,
-        getUser  // Providing getUser to the context
-    };
-
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

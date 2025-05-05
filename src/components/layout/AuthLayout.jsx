@@ -10,10 +10,7 @@ const AuthLayout = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-green-50 to-amber-50 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-            <div className="absolute top-4 right-4">
-                <LanguageSelector />
-            </div>
-
+           
             <motion.div
                 className="w-full "
                 initial={{ opacity: 0, scale: 0.95 }}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaSearch, FaMapMarkerAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import landImage from '../../img/background/land.jpg';
 
 const LandLeasing = () => {
   const [leasingOptions, setLeasingOptions] = useState([]);
@@ -72,14 +73,15 @@ const LandLeasing = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div
-        className="relative h-[60vh] bg-cover bg-center"
-        style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2000')"
+      <div 
+        className="relative h-[60vh] bg-cover bg-center bg-no-repeat"
+        style={{ 
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${landImage})`,
+          backgroundPosition: 'center',
+          backgroundSize: 'cover'
         }}
       >
-        <div className="absolute inset-0 bg-black bg-opacity-50">
+        <div className="absolute inset-0 ">
           <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
               Land Leasing
