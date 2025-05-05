@@ -17,6 +17,9 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+
+    console.log("userauthcontext", user);
+
     useEffect(() => {
         const storedAuth = getStoredAuth();
         if (storedAuth) {
