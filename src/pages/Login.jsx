@@ -62,7 +62,7 @@ const Login = () => {
   };
 
   return (
-    <div className='flex items-center justify-center min-h-screen bg-gradient-to-r from-green-50 to-green-100 p-4'>
+    <div className='flex items-center justify-center min-h-screen bg-gradient-to-r from-green-50 to-green-100 '>
       <motion.div
         className='bg-white shadow-lg rounded-lg p-8 w-full max-w-md'
         initial={{ opacity: 0, scale: 0.9 }}
@@ -156,6 +156,17 @@ const Login = () => {
             {!loading && <FiArrowRight />}
           </motion.button>
         </motion.form>
+
+        <div className='mt-6 pt-6 border-t border-gray-200'>
+          <p className='text-center text-gray-600'>
+            Are you a seller?{' '}
+            <Link
+              to='/shop/login'
+              className='text-green-600 hover:text-green-700 font-medium'>
+              Login as Seller
+            </Link>
+          </p>
+        </div>
 
         <motion.div
           initial={{ opacity: 0 }}

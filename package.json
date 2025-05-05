@@ -18,6 +18,7 @@
     "i18next-browser-languagedetector": "^8.1.0",
     "i18next-http-backend": "^3.0.2",
     "js-cookie": "^3.0.5",
+    "lucide-react": "^0.507.0",
     "react": "^19.1.0",
     "react-countup": "^6.5.3",
     "react-date-range": "^2.0.1",

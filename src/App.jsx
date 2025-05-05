@@ -5,8 +5,7 @@ import {
   Navigate
 } from 'react-router-dom';
 import React, { Suspense, lazy } from 'react';
-import { useAuth } from './hooks/useAuth';
-import Loader from './components/common/Loader';
+import FarmingLoader from './components/loader/FarmingLoader';
 import AuthLayout from './components/layout/AuthLayout';
 import Footer from './components/footer/Footer';
 import { CropProvider } from './context/CropContext';
@@ -26,79 +25,105 @@ const Home = lazy(() => import('./pages/Home/Home'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const Profile = lazy(() => import('./pages/Profile'));
+const ListLand = lazy(() => import('./pages/LandLeasing/ListLand'));
+const ShopLogin = lazy(() => import('./pages/Shop/Auth/ShopLogin'));
+const ShopRegister = lazy(() => import('./pages/Shop/Auth/ShopRegister'));
+const ShopActivation = lazy(() => import('./pages/Shop/Auth/ShopActivation'));
 
 function App() {
   return (
     <AuthProvider>
       <CropProvider>
-          <Suspense fallback={<Loader />}>
-            <Routes>
-              {/* Main Layout Routes */}
+        <Suspense fallback={<FarmingLoader />}>
+          <Routes>
+            {/* Main Layout Routes */}
+            <Route
+              path='/'
+              element={<MainLayout />}>
               <Route
-                path='/'
-                element={<MainLayout />}>
-                <Route
-                  index
-                  element={<Home />}
-                />
-                <Route
-                  path='/land-leasing'
-                  element={<LandLeasing />}
-                />
-                <Route
-                  path='/land-leasing/:id'
-                  element={<LandLeasingDetails />}
-                />
-                <Route
-                  path='/rental-equipment'
-                  element={<RentalEquipment />}
-                />
-                <Route
-                  path='/rental-equipment/:id'
-                  element={<RentalEquipmentDetails />}
-                />
-                <Route
-                  path='/crop-prediction'
-                  element={<CropPrediction />}
-                />
-                <Route
-                  path='/dashboard'
-                  element={
-                    <ProtectedRoute>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path='/chat'
-                  element={<Chat />}
-                />
-                <Route
-                  path='/profile'
-                  element={
-                    <ProtectedRoute>
-                      <Profile />
-                    </ProtectedRoute>
-                  }
-                />
-              </Route>
+                index
+                element={<Home />}
+              />
+              <Route
+                path='/land-leasing'
+                element={<LandLeasing />}
+              />
+              <Route
+                path='/land-leasing/:id'
+                element={<LandLeasingDetails />}
+              />
+              <Route
+                path='/rental-equipment'
+                element={<RentalEquipment />}
+              />
+              <Route
+                path='/rental-equipment/:id'
+                element={<RentalEquipmentDetails />}
+              />
+              <Route
+                path='/crop-prediction'
+                element={<CropPrediction />}
+              />
+              <Route
+                path='/dashboard'
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/chat'
+                element={<Chat />}
+              />
+              <Route
+                path='/profile'
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/land-leasing/list'
+                element={<ListLand />}
+              />
+            </Route>
 
-              {/* Auth Layout Routes */}
+            {/* Auth Layout Routes */}
+            <Route
+              path='/'
+              element={<MainLayout />}>
               <Route
-                path='/'
-                element={<AuthLayout />}>
-                <Route
-                  path='login'
-                  element={<Login />}
-                />
-                <Route
-                  path='register'
-                  element={<Register />}
-                />
-              </Route>
-            </Routes>
-            <Footer />
-          </Suspense>
+                path='login'
+                element={<Login />}
+              />
+              <Route
+                path='register'
+                element={<Register />}
+              />
+            </Route>
+            <Route
+              path='/shop'
+              element={<MainLayout />}>
+              {/* Shop Routes */}
+              <Route
+                path='/shop/login'
+                element={<ShopLogin />}
+              />
+              <Route
+                path='/shop/register'
+                element={<ShopRegister />}
+              />
+
+              <Route
+                path='/shop/activation'
+                element={<ShopActivation />}
+              />
+            </Route>
+          </Routes>
+          <Footer />
+        </Suspense>
       </CropProvider>
     </AuthProvider>
   );
