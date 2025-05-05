@@ -13,12 +13,13 @@ import CropPrediction from './pages/cropPrediction/cropPrediciton';
 import Dashboard from './pages/dashboard/Dashboard';
 import Chat from './pages/chat/Chat';
 import MainLayout from './components/layout/MainLayout';
+import UserActivation from'./pages/UserActivation';
+
 
 // Lazy-loaded pages
 const Home = lazy(() => import('./pages/Home/Home'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
-const Activate = lazy(() => import('./pages/Activate'));
 const Profile = lazy(() => import('./pages/Profile'));
 
 // Protected route component
@@ -57,7 +58,7 @@ function App() {
           <Route path="/" element={<AuthLayout />}>
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
-            <Route path="activate" element={<Activate />} />
+            <Route path="/activation/:activation_token" element={<UserActivation />} />
           </Route>
         </Routes>
         <Footer />
