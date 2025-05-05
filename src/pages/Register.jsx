@@ -17,6 +17,40 @@ import {
 import toast from 'react-hot-toast';
 
 const Register = () => {
+  // Add animation variants before the state declarations
+  const formVariants = {
+    hidden: { opacity: 0, x: 100 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.5, ease: 'easeOut' }
+    },
+    exit: {
+      opacity: 0,
+      x: -100,
+      transition: { duration: 0.5 }
+    }
+  };
+
+  const inputVariants = {
+    focus: { scale: 1.02, boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)' },
+    blur: { scale: 1, boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' }
+  };
+
+  const dialogVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.3, ease: 'easeOut' }
+    },
+    exit: {
+      opacity: 0,
+      scale: 0.8,
+      transition: { duration: 0.2, ease: 'easeIn' }
+    }
+  };
+
   const { register, error: authError, loading } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
@@ -38,6 +72,326 @@ const Register = () => {
       addressType: 'Home'
     }
   });
+
+  const renderStep1 = () => (
+    <motion.div
+      key='step1'
+      variants={formVariants}
+      initial='hidden'
+      animate='visible'
+      exit='exit'
+      className='space-y-4'>
+      <div className='relative'>
+        <FiUser className='absolute left-3 top-3.5 text-gray-400' />
+        <motion.input
+          type='text'
+          name='name'
+          value={formData.name}
+          onChange={handleChange}
+          placeholder='Full Name'
+          required
+          whileFocus='focus'
+          variants={inputVariants}
+          className='w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all'
+        />
+      </div>
+
+      <div className='relative'>
+        <FiMail className='absolute left-3 top-3.5 text-gray-400' />
+        <motion.input
+          type='email'
+          name='email'
+          value={formData.email}
+          onChange={handleChange}
+          placeholder='Email Address'
+          required
+          whileFocus='focus'
+          variants={inputVariants}
+          className='w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all'
+        />
+      </div>
+
+      <div className='relative'>
+        <FiLock className='absolute left-3 top-3.5 text-gray-400' />
+        <motion.input
+          type={showPassword ? 'text' : 'password'}
+          name='password'
+          value={formData.password}
+          onChange={handleChange}
+          placeholder='Password'
+          required
+          whileFocus='focus'
+          variants={inputVariants}
+          className='w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all'
+        />
+        <button
+          type='button'
+          onClick={() => setShowPassword(!showPassword)}
+          className='absolute right-3 top-3.5 text-gray-400 hover:text-gray-600'>
+          {showPassword ? 'Hide' : 'Show'}
+        </button>
+      </div>
+
+      <div className='relative'>
+        <FiPhone className='absolute left-3 top-3.5 text-gray-400' />
+        <motion.input
+          type='tel'
+          name='phoneNumber'
+          value={formData.phoneNumber}
+          onChange={handleChange}
+          placeholder='Phone Number'
+          required
+          whileFocus='focus'
+          variants={inputVariants}
+          className='w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all'
+        />
+      </div>
+
+      <motion.button
+        type='button'
+        onClick={nextStep}
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.97 }}
+        className='w-full bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 transition flex items-center justify-center space-x-2 font-medium mt-6'>
+        <span>Continue</span>
+        <FiArrowRight />
+      </motion.button>
+    </motion.div>
+  );
+
+  const renderStep2 = () => (
+    <motion.div
+      key='step2'
+      variants={formVariants}
+      initial='hidden'
+      animate='visible'
+      exit='exit'
+      className='space-y-4'>
+      <h3 className='text-lg font-semibold text-gray-700 mb-4'>
+        Address Information
+      </h3>
+
+      <div className='relative'>
+        <FiMapPin className='absolute left-3 top-3.5 text-gray-400' />
+        <motion.input
+          type='text'
+          name='addresses.country'
+          value={formData.addresses[0].country}
+          onChange={handleChange}
+          placeholder='Country'
+          required
+          whileFocus='focus'
+          variants={inputVariants}
+          className='w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all'
+        />
+      </div>
+
+      <div className='relative'>
+        <motion.input
+          type='text'
+          name='addresses.city'
+          value={formData.addresses[0].city}
+          onChange={handleChange}
+          placeholder='City'
+          required
+          whileFocus='focus'
+          variants={inputVariants}
+          className='w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all'
+        />
+      </div>
+
+      <div className='relative'>
+        <motion.input
+          type='text'
+          name='addresses.address1'
+          value={formData.addresses[0].address1}
+          onChange={handleChange}
+          placeholder='Address Line 1'
+          required
+          whileFocus='focus'
+          variants={inputVariants}
+          className='w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all'
+        />
+      </div>
+
+      <div className='relative'>
+        <motion.input
+          type='text'
+          name='addresses.address2'
+          value={formData.addresses[0].address2}
+          onChange={handleChange}
+          placeholder='Address Line 2 (Optional)'
+          whileFocus='focus'
+          variants={inputVariants}
+          className='w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all'
+        />
+      </div>
+
+      <div className='relative'>
+        <motion.input
+          type='text'
+          name='addresses.zipCode'
+          value={formData.addresses[0].zipCode}
+          onChange={handleChange}
+          placeholder='Zip Code'
+          required
+          whileFocus='focus'
+          variants={inputVariants}
+          className='w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all'
+        />
+      </div>
+
+      <div className='flex space-x-3 mt-6'>
+        <motion.button
+          type='button'
+          onClick={prevStep}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          className='w-1/2 bg-gray-200 text-gray-800 p-3 rounded-lg hover:bg-gray-300 transition font-medium'>
+          Back
+        </motion.button>
+        <motion.button
+          type='button'
+          onClick={nextStep}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          className='w-1/2 bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 transition flex items-center justify-center space-x-2 font-medium'>
+          <span>Continue</span>
+          <FiArrowRight />
+        </motion.button>
+      </div>
+    </motion.div>
+  );
+
+  const renderStep3 = () => (
+    <motion.div
+      key='step3'
+      variants={formVariants}
+      initial='hidden'
+      animate='visible'
+      exit='exit'
+      className='space-y-4'>
+      <h3 className='text-lg font-semibold text-gray-700 mb-4'>
+        Profile Picture
+      </h3>
+      <div className='relative'>
+        <FiImage className='absolute left-3 top-3.5 text-gray-400' />
+        <motion.input
+          type='file'
+          accept='image/*'
+          onChange={handleFileChange}
+          className='w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all'
+        />
+      </div>
+      {formData.avatar && (
+        <div className='flex items-center space-x-2 text-green-500'>
+          <FiCheck />
+          <span>Image selected: {formData.avatar.name}</span>
+        </div>
+      )}
+      <div className='flex space-x-3 mt-6'>
+        <motion.button
+          type='button'
+          onClick={prevStep}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          className='w-1/2 bg-gray-200 text-gray-800 p-3 rounded-lg hover:bg-gray-300 transition font-medium'>
+          Back
+        </motion.button>
+        <motion.button
+          type='submit'
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          className='w-1/2 bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 transition flex items-center justify-center space-x-2 font-medium'
+          disabled={loading}>
+          <span>{loading ? 'Registering...' : 'Complete Registration'}</span>
+          {!loading && <FiCheck />}
+        </motion.button>
+      </div>
+    </motion.div>
+  );
+
+  // Activation Dialog Component
+  const ActivationDialog = () => (
+    <AnimatePresence>
+      {showActivationDialog && (
+        <motion.div
+          className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}>
+          <motion.div
+            className='bg-white rounded-lg p-6 max-w-md w-full shadow-xl'
+            variants={dialogVariants}
+            initial='hidden'
+            animate='visible'
+            exit='exit'>
+            <div className='flex justify-end'>
+              <button
+                onClick={() => {
+                  setShowActivationDialog(false);
+                  navigate('/login');
+                }}
+                className='text-gray-500 hover:text-gray-700'>
+                <FiX size={24} />
+              </button>
+            </div>
+
+            <div className='flex flex-col items-center text-center mb-6'>
+              <div className='bg-green-100 p-4 rounded-full mb-4'>
+                <FiMail className='text-green-500 w-8 h-8' />
+              </div>
+              <h3 className='text-2xl font-bold text-green-600 mb-2'>
+                Check Your Email
+              </h3>
+              <p className='text-gray-600 mb-4'>
+                We've sent an activation link to{' '}
+                <strong>{formData.email}</strong>
+              </p>
+              <div className='bg-yellow-50 border-l-4 border-yellow-500 p-4 text-left w-full mb-4'>
+                <div className='flex'>
+                  <div className='flex-shrink-0'>
+                    <FiAlertCircle className='h-5 w-5 text-yellow-500' />
+                  </div>
+                  <div className='ml-3'>
+                    <p className='text-sm text-yellow-700'>
+                      Please activate your account by clicking the link in the
+                      email before logging in.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className='space-y-3'>
+              <motion.button
+                onClick={() => {
+                  setShowActivationDialog(false);
+                  navigate('/login');
+                }}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className='w-full bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 transition font-medium'>
+                Go to Login
+              </motion.button>
+
+              <p className='text-center text-sm text-gray-500'>
+                Didn't receive the email? Check your spam folder or{' '}
+                <button
+                  onClick={() => {
+                    // Here you could implement a resend activation email function
+                    alert('Resend feature would be implemented here');
+                  }}
+                  className='text-blue-500 hover:text-blue-600 font-medium'>
+                  resend the activation link
+                </button>
+              </p>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
