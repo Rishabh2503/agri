@@ -63,6 +63,7 @@ const Register = () => {
     password: '',
     phoneNumber: '',
     avatar: null,
+    // Change address structure to match API expectations
     address: {
       address1: '',
       address2: '',
@@ -161,42 +162,42 @@ const Register = () => {
 
   const renderStep2 = () => (
     <motion.div
-      key='step2'
+      key="step2"
       variants={formVariants}
-      initial='hidden'
-      animate='visible'
-      exit='exit'
-      className='space-y-4'>
-      <h3 className='text-lg font-semibold text-gray-700 mb-4'>
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      className="space-y-4">
+      <h3 className="text-lg font-semibold text-gray-700 mb-4">
         Address Information
       </h3>
 
-      <div className='relative'>
-        <FiMapPin className='absolute left-3 top-3.5 text-gray-400' />
+      <div className="relative">
+        <FiMapPin className="absolute left-3 top-3.5 text-gray-400" />
         <motion.input
-          type='text'
-          name='addresses.country'
-          value={formData.addresses[0].country}
+          type="text"
+          name="addresses.country"
+          value={formData.address.country}
           onChange={handleChange}
-          placeholder='Country'
+          placeholder="Country"
           required
-          whileFocus='focus'
+          whileFocus="focus"
           variants={inputVariants}
-          className='w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all'
+          className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all"
         />
       </div>
 
-      <div className='relative'>
+      <div className="relative">
         <motion.input
-          type='text'
-          name='addresses.city'
-          value={formData.addresses[0].city}
+          type="text"
+          name="addresses.city"
+          value={formData.address.city}
           onChange={handleChange}
-          placeholder='City'
+          placeholder="City"
           required
-          whileFocus='focus'
+          whileFocus="focus"
           variants={inputVariants}
-          className='w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all'
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all"
         />
       </div>
 
@@ -204,7 +205,7 @@ const Register = () => {
         <motion.input
           type='text'
           name='addresses.address1'
-          value={formData.addresses[0].address1}
+          value={formData.address.address1}
           onChange={handleChange}
           placeholder='Address Line 1'
           required
@@ -218,7 +219,7 @@ const Register = () => {
         <motion.input
           type='text'
           name='addresses.address2'
-          value={formData.addresses[0].address2}
+          value={formData.address.address2}
           onChange={handleChange}
           placeholder='Address Line 2 (Optional)'
           whileFocus='focus'
@@ -231,7 +232,7 @@ const Register = () => {
         <motion.input
           type='text'
           name='addresses.zipCode'
-          value={formData.addresses[0].zipCode}
+          value={formData.address.zipCode}
           onChange={handleChange}
           placeholder='Zip Code'
           required
@@ -398,9 +399,11 @@ const Register = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name.includes('address.')) {
+
+    if (name.includes('addresses.')) {
+      // Fix address field updates
       const addressField = name.split('.')[1];
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         address: {
           ...prev.address,
@@ -408,7 +411,7 @@ const Register = () => {
         }
       }));
     } else {
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         [name]: value
       }));
@@ -520,21 +523,20 @@ const Register = () => {
               key={stepNumber}
               className='flex flex-col items-center'>
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  stepNumber === step
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${stepNumber === step
                     ? 'bg-green-500 text-white'
                     : stepNumber < step
-                    ? 'bg-green-200 text-green-700'
-                    : 'bg-gray-200 text-gray-500'
-                }`}>
+                      ? 'bg-green-200 text-green-700'
+                      : 'bg-gray-200 text-gray-500'
+                  }`}>
                 {stepNumber < step ? <FiCheck /> : stepNumber}
               </div>
               <span className='text-xs mt-1 text-gray-500'>
                 {stepNumber === 1
                   ? 'Basic Info'
                   : stepNumber === 2
-                  ? 'Address'
-                  : 'Profile'}
+                    ? 'Address'
+                    : 'Profile'}
               </span>
             </div>
           ))}
@@ -588,6 +590,26 @@ const Register = () => {
       </AnimatePresence>
     </div>
   );
+};
+
+const register = async (formData) => {
+  try {
+    const response = await fetch('https://krishimart-back.onrender.com/api/v2/user/register', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Registration failed');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Registration error:', error);
+    throw error;
+  }
 };
 
 export default Register;
