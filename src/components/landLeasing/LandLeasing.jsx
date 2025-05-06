@@ -1,68 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FaSearch, FaMapMarkerAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { useCart } from '../../context/CartContext';
+import { useLeasingContext } from '../../context/LeasingContext';
 
 import landImage from '../../img/background/land.jpg';
 
 const LandLeasing = () => {
-  const [leasingOptions, setLeasingOptions] = useState([]);
-  const [searchInput, setSearchInput] = useState('');
   const navigate = useNavigate();
+  const { addToCart } = useCart();
+  const { leasingOptions } = useLeasingContext();
+  const [searchInput, setSearchInput] = useState('');
 
-  // Sample leasing options with vergara instead of id
-  const sampleLeasingOptions = [
-    {
-      vergara: 1,
-      img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000',
-      title: 'Agricultural Land',
-      description: 'Lease fertile farmland for seasonal crops',
-      location: 'Karnataka'
-    },
-    {
-      vergara: 2,
-      img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=1000',
-      title: 'Orchard Land',
-      description: 'Perfect for fruit cultivation and long-term farming',
-      location: 'Punjab'
-    },
-    {
-      vergara: 3,
-      img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000',
-      title: 'Paddy Fields',
-      description: 'Specialized land for rice cultivation',
-      location: 'West Bengal'
-    },
-    {
-      vergara: 4,
-      img: 'https://images.unsplash.com/photo-1589328956162-4e2f54b36881?q=80&w=1000',
-      title: 'Greenhouse Plots',
-      description: 'Protected cultivation areas for high-value crops',
-      location: 'Maharashtra'
-    },
-    {
-      vergara: 5,
-      img: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=1000',
-      title: 'Mixed Farming Land',
-      description: 'Suitable for diverse agricultural activities',
-      location: 'Rajasthan'
-    },
-    {
-      vergara: 6,
-      img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000',
-      title: 'Plantation Land',
-      description: 'Ideal for commercial crop cultivation',
-      location: 'Kerala'
-    }
-  ];
+  const handleLeasingClick = (id) => {
+    navigate(`/land-leasing/${id}`);
+  };
 
-  useEffect(() => {
-    setLeasingOptions(sampleLeasingOptions);
-  }, []);
+  const handleAddToCart = (item) => {
+    const cartItem = {
+      id: item.vergara,
+      type: 'land',
+      title: item.title,
+      description: item.description,
+      location: item.location,
+      price: item.price,
+      area: item.area,
+      duration: item.duration,
+      image: item.img,
+      leaseAmount: item.price,
+      timestamp: new Date().toISOString()
+    };
 
-  const handleLeasingClick = (vergara) => {
-    // For debugging purposes you can log the vergara:
-    console.log('Navigating to leasing details for vergara:', vergara);
-    navigate(`/land-leasing/${vergara}`);
+    addToCart(cartItem);
+    alert('Added to cart successfully!');
   };
 
   return (
@@ -117,8 +87,7 @@ const LandLeasing = () => {
             )
             .map((option) => (
               <div
-                key={option.vergara}
-                onClick={() => handleLeasingClick(option.vergara)}
+                key={option.id} // Changed from vergara to id
                 className='cursor-pointer group'>
                 <div className='bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden'>
                   <div className='relative'>
@@ -127,24 +96,47 @@ const LandLeasing = () => {
                       alt={option.title}
                       className='w-full h-56 object-cover transform group-hover:scale-105 transition-transform duration-300'
                     />
+                    <div className='absolute top-4 right-4 bg-green-600 text-white px-3 py-1 rounded-full text-sm'>
+                      ₹{option.price}/month
+                    </div>
                   </div>
                   <div className='p-6'>
                     <h3 className='text-xl font-bold text-gray-900'>
                       {option.title}
                     </h3>
                     <p className='text-gray-600 mb-2'>{option.description}</p>
-                    <div className='flex items-center text-gray-600'>
-                      <FaMapMarkerAlt className='mr-2' />
-                      <span>{option.location}</span>
+                    <div className='space-y-2'>
+                      <div className='flex items-center text-gray-600'>
+                        <FaMapMarkerAlt className='mr-2' />
+                        <span>{option.location}</span>
+                      </div>
+                      <div className='flex items-center text-gray-600'>
+                        <span className='mr-2'>Area:</span>
+                        <span>{option.area}</span>
+                      </div>
+                      <div className='flex items-center text-gray-600'>
+                        <span className='mr-2'>Duration:</span>
+                        <span>{option.duration}</span>
+                      </div>
                     </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleLeasingClick(option.vergara);
-                      }}
-                      className='mt-4 w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors duration-300'>
-                      View Details
-                    </button>
+                    <div className='flex gap-2 mt-4'>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToCart(option);
+                        }}
+                        className='flex-1 bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors duration-300'>
+                        Add to Cart
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleLeasingClick(option.id); // Changed from vergara to id
+                        }}
+                        className='flex-1 border border-green-600 text-green-600 py-2 px-4 rounded-md hover:bg-green-50 transition-colors duration-300'>
+                        View Details
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

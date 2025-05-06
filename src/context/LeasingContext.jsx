@@ -1,0 +1,202 @@
+import React, { createContext, useContext, useState } from 'react';
+import logo from "../img/logo.png"
+const LeasingContext = createContext();
+const DEFAULT_LAND_IMAGES = {
+    default: logo,
+    logo: logo,
+    landImages: {
+        farmland: '/assets/images/lands/farmland.jpg',
+        riverfront: '/assets/images/lands/riverfront.jpg',
+        organic: '/assets/images/lands/organic-farm.jpg',
+        orchard: '/assets/images/lands/orchard.jpg',
+        desert: '/assets/images/lands/desert-farm.jpg',
+        tea: '/assets/images/lands/tea-estate.jpg',
+        paddy: '/assets/images/lands/paddy-field.jpg',
+        flower: '/assets/images/lands/flower-farm.jpg',
+        aquaponics: '/assets/images/lands/aquaponics.jpg'
+    }
+};
+
+export const LeasingProvider = ({ children }) => {
+    const [leasingOptions] = useState([
+        {
+            id: 1,
+            img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef' || DEFAULT_LAND_IMAGES.logo,
+            title: 'Premium Farmland',
+            description: 'Fertile black soil land with irrigation facilities',
+            location: 'Belgaum, Karnataka',
+            price: 25000,
+            area: '5 Acres',
+            soilType: 'Black Cotton Soil',
+            waterSource: 'Borewell + Canal Irrigation',
+            cropTypes: ['Rice', 'Wheat', 'Sugarcane', 'Cotton'],
+            availability: 'Available from June 2024',
+            ownerContact: 'owner1@example.com',
+            ownerPhone: '+91-9876543210',
+            ownerName: 'Rajesh Patil',
+            subsidySchemes: ['PM-KISAN', 'Soil Health Card', 'KCC'],
+            facilities: ['Storage', 'Equipment', 'Power'],
+            documents: ['Aadhaar', '7/12 Extract', 'Bank Account']
+        },
+        {
+            id: 2,
+            img: 'https://images.unsplash.com/photo-1523741543316-beb7fc7023d8' || DEFAULT_LAND_IMAGES.logo,
+            title: 'Riverfront Agriculture Land',
+            description: 'River-adjacent land perfect for vegetable farming',
+            location: 'Nashik, Maharashtra',
+            price: 30000,
+            area: '7 Acres',
+            soilType: 'Alluvial Soil',
+            waterSource: 'River Irrigation',
+            cropTypes: ['Vegetables', 'Grapes', 'Onions'],
+            availability: 'Available from May 2024',
+            ownerContact: 'owner2@example.com',
+            ownerPhone: '+91-9876543211',
+            ownerName: 'Suresh Deshmukh',
+            subsidySchemes: ['Maharashtra AG Scheme', 'PM-KISAN'],
+            facilities: ['Cold Storage', 'Transport', 'Power'],
+            documents: ['Aadhaar', 'Land Records', 'Bank Account']
+        },
+        {
+            id: 3,
+            img: 'https://images.unsplash.com/photo-1530507629858-e3759c371e91' || DEFAULT_LAND_IMAGES.logo,
+            title: 'Organic Farming Plot',
+            description: 'Certified organic land with natural water source',
+            location: 'Coorg, Karnataka',
+            price: 35000,
+            area: '3 Acres',
+            soilType: 'Red Soil',
+            waterSource: 'Natural Spring + Rainfall',
+            cropTypes: ['Coffee', 'Pepper', 'Cardamom'],
+            availability: 'Available from July 2024',
+            ownerContact: 'owner3@example.com',
+            ownerPhone: '+91-9876543212',
+            ownerName: 'George Thomas',
+            subsidySchemes: ['Organic Farming Incentive', 'PM-KISAN'],
+            facilities: ['Processing Unit', 'Storage', 'Power'],
+            documents: ['Aadhaar', 'Organic Certification', 'Bank Account']
+        },
+        {
+            id: 4,
+            img: 'https://images.unsplash.com/photo-1580716919533-4980d3b23f54' || DEFAULT_LAND_IMAGES.logo,
+            title: 'Hilly Terrain Orchard',
+            description: 'Ideal for apple and plum cultivation in cool climate',
+            location: 'Shimla, Himachal Pradesh',
+            price: 45000,
+            area: '6 Acres',
+            soilType: 'Loamy Soil',
+            waterSource: 'Rain-fed + Spring',
+            cropTypes: ['Apples', 'Plums', 'Cherries'],
+            availability: 'Available from August 2024',
+            ownerContact: 'owner4@example.com',
+            ownerPhone: '+91-9876543214',
+            ownerName: 'Anita Sharma',
+            subsidySchemes: ['Horticulture Development Scheme'],
+            facilities: ['Storage', 'Drip Irrigation', 'Fencing'],
+            documents: ['Aadhaar', 'Land Deed', 'Bank Account']
+        },
+        {
+            id: 5,
+            img: 'https://images.unsplash.com/photo-1591978400962-6bd9cceca7d4' || DEFAULT_LAND_IMAGES.logo,
+            title: 'Desert-Edge Agro Land',
+            description: 'Well-irrigated desert-adjacent land with solar power',
+            location: 'Bikaner, Rajasthan',
+            price: 20000,
+            area: '8 Acres',
+            soilType: 'Sandy Loam',
+            waterSource: 'Tube Well + Drip Irrigation',
+            cropTypes: ['Millets', 'Guar', 'Pulses'],
+            availability: 'Available from March 2024',
+            ownerContact: 'owner5@example.com',
+            ownerPhone: '+91-9876543215',
+            ownerName: 'Ramesh Bhati',
+            subsidySchemes: ['Desert Agriculture Scheme', 'PM-KISAN'],
+            facilities: ['Solar Power', 'Storage', 'Irrigation System'],
+            documents: ['Aadhaar', 'Land Certificate', 'Bank Account']
+        },
+        {
+            id: 6,
+            img: 'https://images.unsplash.com/photo-1526202250844-2f38a3c1286e' || DEFAULT_LAND_IMAGES.logo,
+            title: 'Tea Estate Plot',
+            description: 'Perfect for tea plantation with misty slopes',
+            location: 'Munnar, Kerala',
+            price: 60000,
+            area: '4 Acres',
+            soilType: 'Acidic Soil',
+            waterSource: 'Rain + Reservoir',
+            cropTypes: ['Tea', 'Spices'],
+            availability: 'Available from September 2024',
+            ownerContact: 'owner6@example.com',
+            ownerPhone: '+91-9876543216',
+            ownerName: 'Joseph Mathew',
+            subsidySchemes: ['Tea Board Subsidy'],
+            facilities: ['Labor Quarters', 'Processing Shed', 'Rainwater Harvesting'],
+            documents: ['Aadhaar', 'Plantation License', 'Bank Account']
+        },
+        {
+            id: 7,
+            img: 'https://images.unsplash.com/photo-1556761175-4b46a572b786',
+            title: 'Rice Paddy Fields',
+            description: 'Lush green fields ideal for seasonal rice cultivation',
+            location: 'East Godavari, Andhra Pradesh',
+            price: 28000,
+            area: '9 Acres',
+            soilType: 'Clay Loam',
+            waterSource: 'Canal + Rain-fed',
+            cropTypes: ['Rice', 'Banana'],
+            availability: 'Available from May 2024',
+            ownerContact: 'owner7@example.com',
+            ownerPhone: '+91-9876543217',
+            ownerName: 'Kiran Rao',
+            subsidySchemes: ['PM-KISAN', 'Irrigation Scheme'],
+            facilities: ['Canal Access', 'Pumpset', 'Storage'],
+            documents: ['Aadhaar', 'Pattadar Passbook', 'Bank Account']
+        },
+        {
+            id: 8,
+            img: 'https://images.unsplash.com/photo-1590080876435-14d4ebd29923' || DEFAULT_LAND_IMAGES.logo,
+            title: 'Flower Cultivation Farm',
+            description: 'Land dedicated to rose and marigold cultivation',
+            location: 'Krishnagiri, Tamil Nadu',
+            price: 27000,
+            area: '4.5 Acres',
+            soilType: 'Loamy Soil',
+            waterSource: 'Drip Irrigation + Well',
+            cropTypes: ['Roses', 'Marigolds', 'Jasmine'],
+            availability: 'Available from April 2024',
+            ownerContact: 'owner8@example.com',
+            ownerPhone: '+91-9876543218',
+            ownerName: 'Meena Raj',
+            subsidySchemes: ['Floriculture Mission', 'PM-KISAN'],
+            facilities: ['Greenhouse', 'Fencing', 'Cold Storage'],
+            documents: ['Aadhaar', 'Land Ownership Proof', 'Bank Account']
+        },
+        {
+            id: 9,
+            img: 'https://images.unsplash.com/photo-1604467761182-16de59f34611',
+            title: 'Aquaponics Setup Land',
+            description: 'Ready land with aquaponics infrastructure',
+            location: 'Ahmedabad, Gujarat',
+            price: 50000,
+            area: '2 Acres',
+            soilType: 'N/A (Hydroponic Bed)',
+            waterSource: 'Recycled + Tank Supply',
+            cropTypes: ['Lettuce', 'Tomatoes', 'Fish'],
+            availability: 'Available from October 2024',
+            ownerContact: 'owner9@example.com',
+            ownerPhone: '+91-9876543219',
+            ownerName: 'Dhruv Mehta',
+            subsidySchemes: ['Hydroponic Grant', 'Fisheries Scheme'],
+            facilities: ['Greenhouse', 'Fish Tanks', 'Filtration System'],
+            documents: ['Aadhaar', 'Tech License', 'Bank Account']
+        },
+    ]);
+
+    return (
+        <LeasingContext.Provider value={{ leasingOptions }}>
+            {children}
+        </LeasingContext.Provider>
+    );
+};
+
+export const useLeasingContext = () => useContext(LeasingContext);
