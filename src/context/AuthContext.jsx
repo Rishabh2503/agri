@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { loginUser, getCurrentUser, logoutUser } from '../services/authService';
+import { loginUser, getCurrentUser, logoutUser, registerUser } from '../services/authService';
 
 export const AuthContext = createContext();
 
@@ -45,6 +45,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const register = async (formData) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await registerUser(formData);
+      return response;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = async () => {
     try {
       await logoutUser();
@@ -63,6 +77,7 @@ export const AuthProvider = ({ children }) => {
     error,
     login,
     logout,
+    register,
     isAuthenticated: !!user
   };
 
