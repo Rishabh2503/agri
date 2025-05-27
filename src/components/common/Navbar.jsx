@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../hooks/useAuth';
 import LanguageSelector from './LanguageSelector';
+import logo from '../../img/logo.png';
 
 const Navbar = () => {
   const { t } = useTranslation();
@@ -17,158 +18,149 @@ const Navbar = () => {
     navigate('/login');
   };
 
+  const navItems = [
+    { name: 'Home', path: '/' },
+    { name: 'Land Leasing', path: '/land-leasing' },
+    { name: 'Rental Equipment', path: '/rental-equipment' },
+    { name: 'Crop Prediction', path: '/crop-prediction' },
+    { name: 'Chat', path: '/chat' }
+  ];
+
   return (
-    <nav className="bg-white shadow-md">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          {/* Logo */}
-          <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="text-xl font-bold text-green-600">KrishiMart</span>
-            </Link>
+    <nav className='relative top-0 left-0 right-0 bg-white shadow-md z-50'>
+      <div className='max-w-full mx-auto px-4 sm:px-6 lg:px-8'>
+        <div className='flex justify-between h-16'>
+          {/* Logo Section */}
+          <div className='flex-shrink-0 flex items-center'>
+            <div
+              className='flex items-center cursor-pointer gap-3'
+              onClick={() => navigate('/')}
+              role='button'
+              tabIndex={0}
+              onKeyPress={(e) => e.key === 'Enter' && navigate('/')}>
+              <img
+                src={logo}
+                className='h-10 w-auto object-contain'
+                alt='Krishi Mart Logo'
+              />
+              <h3 className='text-xl font-bold text-green-600 hidden sm:block'>
+                Krishi Mart
+              </h3>
+            </div>
           </div>
 
-          {/* Links for Desktop */}
-          <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-            <Link
-              to="/"
-              className="border-transparent text-gray-700 hover:text-green-600 inline-flex items-center px-1 pt-1 border-b-2 hover:border-green-400"
-            >
-              Home
-            </Link>
-            <Link
-              to="/land-leasing"
-              className="border-transparent text-gray-700 hover:text-green-600 inline-flex items-center px-1 pt-1 border-b-2 hover:border-green-400"
-            >
-              Land Leasing
-            </Link>
-            <Link
-              to="/rental-equipment"
-              className="border-transparent text-gray-700 hover:text-green-600 inline-flex items-center px-1 pt-1 border-b-2 hover:border-green-400"
-            >
-              Rental Equipment
-            </Link>
-            <Link
-              to="/crop-prediction"
-              className="border-transparent text-gray-700 hover:text-green-600 inline-flex items-center px-1 pt-1 border-b-2 hover:border-green-400"
-            >
-              Crop Prediction
-            </Link>
+          {/* Navigation Links - Desktop */}
+          <div className='hidden lg:flex lg:items-center lg:space-x-8'>
+            {navItems.map((item) => (
+              <Link
+                key={item.name}
+                to={item.path}
+                className='text-base font-medium text-gray-700 hover:text-green-600 transition-colors duration-200'>
+                {item.name}
+              </Link>
+            ))}
             {isAuthenticated && (
-              <>
-                <Link
-                  to="/dashboard"
-                  className="border-transparent text-gray-700 hover:text-green-600 inline-flex items-center px-1 pt-1 border-b-2 hover:border-green-400"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  to="/add-product"
-                  className="border-transparent text-gray-700 hover:text-green-600 inline-flex items-center px-1 pt-1 border-b-2 hover:border-green-400"
-                >
-                  Add Product
-                </Link>
-                <Link
-                  to="/chat"
-                  className="border-transparent text-gray-700 hover:text-green-600 inline-flex items-center px-1 pt-1 border-b-2 hover:border-green-400"
-                >
-                  Chat
-                </Link>
-              </>
+              <Link
+                to='/dashboard'
+                className='text-base font-medium text-gray-700 hover:text-green-600 transition-colors duration-200'>
+                {t('Dashboard')}
+              </Link>
             )}
           </div>
 
-          {/* Profile or Login/Signup */}
-          <div className="hidden sm:ml-6 sm:flex sm:items-center">
-            <LanguageSelector />
+          {/* Right Section - Desktop */}
+          <div className='hidden lg:flex lg:items-center lg:space-x-4'>
             {isAuthenticated ? (
-              <div className="ml-3 relative">
-                <button
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                >
-                  <span className="sr-only">Open user menu</span>
-                  <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
-                    <span className="text-green-700 font-medium">{user?.name?.charAt(0)}</span>
-                  </div>
-                  <span className="ml-2 text-gray-700">{user?.name}</span>
+              <div
+                className='relative ml-4'
+                onMouseEnter={() => setIsProfileOpen(true)}
+                onMouseLeave={() => setIsProfileOpen(false)}>
+                <button className='flex items-center space-x-3 bg-gray-100 hover:bg-gray-200 transition-colors duration-200 rounded-full py-2 px-4'>
+                  <img
+                    className='h-8 w-8 rounded-full object-cover border-2 border-green-500'
+                    src={user?.avatar || '/path/to/default-avatar.png'}
+                    alt='User Avatar'
+                  />
+                  <span className='text-sm font-medium text-gray-700'>
+                    {user?.name ? `Hi, ${user.name}` : 'Hi, User'}
+                  </span>
                 </button>
 
                 <AnimatePresence>
                   {isProfileOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: -10 }}
+                      initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
-                    >
-                      <div className="py-1">
-                        <Link
-                          to="/profile"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => setIsProfileOpen(false)}
-                        >
-                          {t('nav.profile')}
-                        </Link>
-                        <button
-                          onClick={() => {
-                            handleLogout();
-                            setIsProfileOpen(false);
-                          }}
-                          className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          {t('nav.logout')}
-                        </button>
-                      </div>
+                      exit={{ opacity: 0, y: 10 }}
+                      className='absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5'>
+                      <Link
+                        to='/profile'
+                        className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'>
+                        {t('Profile')}
+                      </Link>
+                      <Link
+                        to='/cart'
+                        className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'>
+                        {t('Cart')}
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className='block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'>
+                        {t('Logout')}
+                      </button>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
             ) : (
-              <div className="flex items-center space-x-4">
-                <Link
-                  to="/login"
-                  className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  {t('nav.login')}
-                </Link>
-                <Link
-                  to="/register"
-                  className="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700 transition-colors"
-                >
-                  {t('nav.register')}
-                </Link>
+              <div className='flex items-center space-x-4'>
+                <button
+                  onClick={() => navigate('/login')}
+                  className='inline-flex items-center px-4 py-2 border border-green-600 text-sm font-medium rounded-md text-green-600 hover:bg-green-600 hover:text-white transition-colors duration-200'>
+                  {t('Login')}
+                </button>
+                <button
+                  onClick={() => navigate('/register')}
+                  className='inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors duration-200'>
+                  {t('Register')}
+                </button>
               </div>
             )}
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="flex items-center sm:hidden">
+          <div className='flex items-center lg:hidden'>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-green-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500"
-            >
-              <span className="sr-only">Open main menu</span>
-              <svg
-                className={`${isMenuOpen ? 'hidden' : 'block'} h-6 w-6`}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-              <svg
-                className={`${isMenuOpen ? 'block' : 'hidden'} h-6 w-6`}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              className='inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-green-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500'>
+              <span className='sr-only'>Open main menu</span>
+              {isMenuOpen ? (
+                <svg
+                  className='h-6 w-6'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke='currentColor'>
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M6 18L18 6M6 6l12 12'
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className='h-6 w-6'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke='currentColor'>
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M4 6h16M4 12h16M4 18h16'
+                  />
+                </svg>
+              )}
             </button>
           </div>
         </div>
@@ -178,108 +170,62 @@ const Navbar = () => {
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
-            className="sm:hidden"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-          >
-            <div className="pt-2 pb-3 space-y-1">
-              <Link
-                to="/"
-                className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-gray-700 hover:bg-gray-50 hover:border-green-400 hover:text-green-600"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {t('nav.home')}
-              </Link>
-              <Link
-                to="/land-leasing"
-                className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-gray-700 hover:bg-gray-50 hover:border-green-400 hover:text-green-600"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {t('nav.landLeasing')}
-              </Link>
-              <Link
-                to="/rental-equipment"
-                className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-gray-700 hover:bg-gray-50 hover:border-green-400 hover:text-green-600"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {t('nav.rentalEquipment')}
-              </Link>
+            className='lg:hidden'>
+            <div className='px-2 pt-2 pb-3 space-y-1 bg-white shadow-lg'>
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  className='block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50'
+                  onClick={() => setIsMenuOpen(false)}>
+                  {item.name}
+                </Link>
+              ))}
               {isAuthenticated && (
                 <>
                   <Link
-                    to="/dashboard"
-                    className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-gray-700 hover:bg-gray-50 hover:border-green-400 hover:text-green-600"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {t('nav.dashboard')}
+                    to='/dashboard'
+                    className='block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50'
+                    onClick={() => setIsMenuOpen(false)}>
+                    {t('dashboard')}
                   </Link>
                   <Link
-                    to="/add-product"
-                    className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-gray-700 hover:bg-gray-50 hover:border-green-400 hover:text-green-600"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {t('nav.addProduct')}
+                    to='/profile'
+                    className='block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50'
+                    onClick={() => setIsMenuOpen(false)}>
+                    {t('profile')}
                   </Link>
-                  <Link
-                    to="/chat"
-                    className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-gray-700 hover:bg-gray-50 hover:border-green-400 hover:text-green-600"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {t('nav.chat')}
-                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMenuOpen(false);
+                    }}
+                    className='block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50'>
+                    {t('logout')}
+                  </button>
                 </>
               )}
-            </div>
-            <div className="pt-4 pb-3 border-t border-gray-200">
-              {isAuthenticated ? (
-                <div>
-                  <div className="flex items-center px-4">
-                    <div className="flex-shrink-0">
-                      <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                        <span className="text-green-700 font-medium">{user?.name?.charAt(0)}</span>
-                      </div>
-                    </div>
-                    <div className="ml-3">
-                      <div className="text-base font-medium text-gray-800">{user?.name}</div>
-                      <div className="text-sm font-medium text-gray-500">{user?.email}</div>
-                    </div>
-                  </div>
-                  <div className="mt-3 space-y-1">
-                    <Link
-                      to="/profile"
-                      className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-100"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {t('nav.profile')}
-                    </Link>
-                    <button
-                      onClick={() => {
-                        handleLogout();
-                        setIsMenuOpen(false);
-                      }}
-                      className="w-full text-left block px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-100"
-                    >
-                      {t('nav.logout')}
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-1 px-4">
-                  <Link
-                    to="/login"
-                    className="block text-base font-medium text-gray-700 hover:bg-gray-100 px-4 py-2"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {t('nav.login')}
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="block text-base font-medium bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {t('nav.register')}
-                  </Link>
+              {!isAuthenticated && (
+                <div className='px-3 py-2 space-y-2'>
+                  <button
+                    onClick={() => {
+                      navigate('/login');
+                      setIsMenuOpen(false);
+                    }}
+                    className='w-full px-4 py-2 text-center border border-green-600 rounded-md text-green-600 hover:bg-green-600 hover:text-white transition-colors duration-200'>
+                    {t('Login')}
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigate('/register');
+                      setIsMenuOpen(false);
+                    }}
+                    className='w-full px-4 py-2 text-center border border-transparent rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors duration-200'>
+                    {t('Register')}
+                  </button>
                 </div>
               )}
             </div>
