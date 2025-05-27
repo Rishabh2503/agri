@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
@@ -125,8 +124,8 @@ const Register = () => {
 
         formData.append("addresses", JSON.stringify([addressObject]));
 
-        const success = await register(formData);
-        if (success) {
+        const response = await register(formData);
+        if (response) {
           toast.success("Registration successful! Please check your email for activation link.");
           // Clear form
           setName("");
@@ -145,7 +144,7 @@ const Register = () => {
         }
       } catch (error) {
         console.error("Registration failed:", error);
-        toast.error(error.response?.data?.message || "Registration failed. Please try again.");
+        toast.error(error.message || "Registration failed. Please try again.");
       }
     } else {
       toast.error("Please fill out all required fields correctly.");
