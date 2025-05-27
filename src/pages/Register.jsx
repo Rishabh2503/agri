@@ -8,7 +8,6 @@ import toast from 'react-hot-toast';
 
 const Register = () => {
   const { register, error: authError, loading } = useAuth();
-  const navigate = useNavigate();
 
   // Form states
   const [email, setEmail] = useState("");
@@ -76,9 +75,15 @@ const Register = () => {
     if (!email) {
       newErrors.email = "Email is required";
       isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Please enter a valid email address";
+      isValid = false;
     }
     if (!password) {
       newErrors.password = "Password is required";
+      isValid = false;
+    } else if (password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters long";
       isValid = false;
     }
     if (!phoneNumber) {
@@ -98,36 +103,52 @@ const Register = () => {
       isValid = false;
     }
 
-    // Set error state if there are validation errors
     setErrors(newErrors);
 
-    // If form is valid, proceed with registration
     if (isValid) {
-      // Create FormData to send the data
-      const formData = new FormData();
-      formData.append("file", avatar);
-      formData.append("name", name);
-      formData.append("email", email);
-      formData.append("password", password);
-      formData.append("phoneNumber", phoneNumber);
-
-      // Create address object from the state and append to formData
-      const addressObject = {
-        ...address,
-        zipCode: Number(address.zipCode), // Ensure zip code is a number
-      };
-
-      formData.append("addresses", JSON.stringify([addressObject]));
-
       try {
-        await register(formData);
-        toast.success("Registration successful!");
+        // Create FormData to send the data
+        const formData = new FormData();
+        if (avatar) {
+          formData.append("file", avatar);
+        }
+        formData.append("name", name);
+        formData.append("email", email);
+        formData.append("password", password);
+        formData.append("phoneNumber", phoneNumber);
+
+        // Create address object from the state and append to formData
+        const addressObject = {
+          ...address,
+          zipCode: Number(address.zipCode), // Ensure zip code is a number
+        };
+
+        formData.append("addresses", JSON.stringify([addressObject]));
+
+        const success = await register(formData);
+        if (success) {
+          toast.success("Registration successful! Please check your email for activation link.");
+          // Clear form
+          setName("");
+          setEmail("");
+          setPassword("");
+          setPhoneNumber("");
+          setAddress({
+            address1: "",
+            address2: "",
+            zipCode: "",
+            country: "India",
+            city: "",
+            addressType: "Home"
+          });
+          setAvatar(null);
+        }
       } catch (error) {
         console.error("Registration failed:", error);
-        toast.error("Registration failed. Please try again.");
+        toast.error(error.response?.data?.message || "Registration failed. Please try again.");
       }
     } else {
-      toast.error("Please fill out all required fields.");
+      toast.error("Please fill out all required fields correctly.");
     }
   };
 
