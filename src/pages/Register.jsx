@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
@@ -6,6 +7,7 @@ import { FaUser, FaEnvelope, FaLock, FaPhone, FaMapMarkerAlt, FaHome } from 'rea
 import toast from 'react-hot-toast';
 
 const Register = () => {
+  const navigate = useNavigate();
   const { register, error: authError, loading } = useAuth();
 
   // Form states
@@ -38,7 +40,13 @@ const Register = () => {
 
   const handleFileInputChange = (e) => {
     const file = e.target.files[0];
-    setAvatar(file);
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast.error("File size should be less than 5MB");
+        return;
+      }
+      setAvatar(file);
+    }
   };
 
   const handleAddressChange = (e) => {
@@ -125,8 +133,17 @@ const Register = () => {
         formData.append("addresses", JSON.stringify([addressObject]));
 
         const response = await register(formData);
+        
         if (response) {
-          toast.success("Registration successful! Please check your email for activation link.");
+          // Show success message with activation instructions
+          toast.success(
+            "Registration successful! Please check your email for the activation link.",
+            {
+              duration: 5000,
+              position: "top-center",
+            }
+          );
+
           // Clear form
           setName("");
           setEmail("");
@@ -141,6 +158,26 @@ const Register = () => {
             addressType: "Home"
           });
           setAvatar(null);
+
+          // Show activation instructions modal
+          toast.custom((t) => (
+            <div className="bg-white p-4 rounded-lg shadow-lg">
+              <h3 className="font-bold text-lg mb-2">Next Steps:</h3>
+              <ol className="list-decimal list-inside space-y-2">
+                <li>Check your email for the activation link</li>
+                <li>Click the activation link in the email</li>
+                <li>Once activated, you can login to your account</li>
+              </ol>
+            </div>
+          ), {
+            duration: 8000,
+            position: "top-center",
+          });
+
+          // Redirect to login page after 5 seconds
+          setTimeout(() => {
+            navigate('/login');
+          }, 5000);
         }
       } catch (error) {
         console.error("Registration failed:", error);
@@ -152,13 +189,19 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100 px-4 ">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100 px-4">
       <div className="max-w-4xl w-full bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
         <div className="w-full md:w-3/5 p-8 md:p-10">
           <div className="mb-8 text-center">
             <h2 className="text-3xl font-bold text-green-700 mb-2">Register</h2>
             <p className="text-gray-600">Create a new account</p>
           </div>
+
+          {authError && (
+            <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-md">
+              {authError}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit}>
             {/* Name Input */}
@@ -255,13 +298,19 @@ const Register = () => {
 
             {/* Avatar File Upload */}
             <div className="mb-6">
-              <label className="block text-gray-700 mb-2">Upload Avatar</label>
-              <input type="file" onChange={handleFileInputChange} className="w-full text-green-500" />
+              <label className="block text-gray-700 mb-2">Upload Avatar (Optional)</label>
+              <input 
+                type="file" 
+                onChange={handleFileInputChange} 
+                accept="image/*"
+                className="w-full text-green-500" 
+              />
+              <p className="text-sm text-gray-500 mt-1">Max file size: 5MB</p>
             </div>
 
             {/* Submit Button */}
             <Button type="submit" disabled={loading}>
-              {loading ? 'Loading...' : 'Register'}
+              {loading ? 'Registering...' : 'Register'}
             </Button>
           </form>
         </div>

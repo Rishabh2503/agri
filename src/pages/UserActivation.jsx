@@ -1,37 +1,67 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { motion } from 'framer-motion';
-
-const API_URL = 'https://krishimart-back.onrender.com/api/v2';
+import { activateUser } from '../services/authService';
+import toast from 'react-hot-toast';
 
 const ActivationPage = () => {
   const { activation_token } = useParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState('loading'); // 'loading' | 'success' | 'error'
   const [message, setMessage] = useState('');
+  const [retryCount, setRetryCount] = useState(0);
+  const MAX_RETRIES = 3;
 
   useEffect(() => {
-    if (activation_token) {
-      const activationEmail = async () => {
-        try {
-          const res = await axios.post(`${API_URL}/user/activation`, {
-            activation_token,
-          });
-          setStatus('success');
-          setMessage(res.data.message || 'Your account has been activated successfully!');
-          
-          setTimeout(() => {
-            navigate("/login");
-          }, 3000);
-        } catch (err) {
-          setStatus('error');
-          setMessage(err.response?.data?.message || 'Activation failed. Please try again or contact support.');
-        }
-      };
-      activationEmail();
+    if (!activation_token) {
+      setStatus('error');
+      setMessage('Invalid activation link. Please check your email for the correct link.');
+      return;
     }
-  }, [activation_token, navigate]);
+
+    const activateAccount = async () => {
+      try {
+        const response = await activateUser(activation_token);
+        setStatus('success');
+        setMessage(response.message || 'Your account has been activated successfully!');
+        toast.success('Account activated successfully!');
+        
+        // Store activation status in localStorage
+        localStorage.setItem('accountActivated', 'true');
+        
+        // Redirect to login after 3 seconds
+        setTimeout(() => {
+          navigate('/login', { 
+            state: { 
+              message: 'Account activated successfully! Please login to continue.' 
+            }
+          });
+        }, 3000);
+      } catch (err) {
+        console.error('Activation error:', err);
+        setStatus('error');
+        const errorMessage = err.message || 'Activation failed. Please try again or contact support.';
+        setMessage(errorMessage);
+        toast.error(errorMessage);
+
+        // If we haven't exceeded max retries, try again
+        if (retryCount < MAX_RETRIES) {
+          setRetryCount(prev => prev + 1);
+          setTimeout(() => {
+            setStatus('loading');
+            activateAccount();
+          }, 2000);
+        }
+      }
+    };
+
+    activateAccount();
+  }, [activation_token, navigate, retryCount]);
+
+  const handleRetry = () => {
+    setStatus('loading');
+    setRetryCount(0);
+  };
 
   const renderContent = () => {
     switch (status) {
@@ -43,9 +73,13 @@ const ActivationPage = () => {
             className="text-blue-600 text-center"
           >
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p>Activating your account...</p>
+            <p className="text-lg font-medium">Activating your account...</p>
+            <p className="text-sm text-gray-500 mt-2">
+              {retryCount > 0 ? `Retry attempt ${retryCount} of ${MAX_RETRIES}` : 'Please wait while we verify your account'}
+            </p>
           </motion.div>
         );
+
       case 'success':
         return (
           <motion.div
@@ -53,14 +87,25 @@ const ActivationPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-green-600 text-center"
           >
-            <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+            <svg 
+              className="w-16 h-16 mx-auto mb-4" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth="2" 
+                d="M5 13l4 4L19 7"
+              />
             </svg>
             <p className="text-xl font-semibold mb-2">Success!</p>
-            <p>{message}</p>
-            <p className="text-sm mt-2">Redirecting to login page...</p>
+            <p className="mb-4">{message}</p>
+            <p className="text-sm text-gray-500">Redirecting to login page...</p>
           </motion.div>
         );
+
       case 'error':
         return (
           <motion.div
@@ -68,26 +113,53 @@ const ActivationPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-red-600 text-center"
           >
-            <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+            <svg 
+              className="w-16 h-16 mx-auto mb-4" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth="2" 
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
             <p className="text-xl font-semibold mb-2">Activation Failed</p>
-            <p>{message}</p>
-            <button
-              onClick={() => navigate('/login')}
-              className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-            >
-              Go to Login
-            </button>
+            <p className="mb-4">{message}</p>
+            <div className="space-y-3">
+              {retryCount < MAX_RETRIES && (
+                <button
+                  onClick={handleRetry}
+                  className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                >
+                  Try Again
+                </button>
+              )}
+              <button
+                onClick={() => navigate('/login')}
+                className="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+              >
+                Go to Login
+              </button>
+              <button
+                onClick={() => navigate('/register')}
+                className="block w-full px-4 py-2 text-red-600 hover:text-red-700 transition-colors"
+              >
+                Try Registering Again
+              </button>
+            </div>
           </motion.div>
         );
+
       default:
         return null;
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100 px-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
         {renderContent()}
       </div>
