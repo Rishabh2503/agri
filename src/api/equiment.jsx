@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import axiosInstance from '../utils/axios';
 
 export const getEquips = async () => {
   try {
@@ -58,53 +59,39 @@ export const createEquipmentReport = async ({
   }
 };
 
-export const createEquipment = async ({
-  owner,
-  manufacturer,
-  title,
-  description,
-  equipment_type,
-  available_start_time,
-  available_end_time,
-  equipment_location,
-  daily_rental,
-  hourly_rental,
-  manufacturing_year,
-  model,
-  condition,
-  horsepower,
-  width,
-  height
-}) => {
+export const createEquipment = async (equipmentData) => {
   try {
-    const headers = {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${Cookies.get('access-token')}`
-    };
-    return await instance.post(
-      '/api/equipment/create/',
-      {
-        owner,
-        manufacturer,
-        title,
-        description,
-        equipment_type,
-        available_start_time,
-        available_end_time,
-        equipment_location,
-        daily_rental,
-        hourly_rental,
-        manufacturing_year,
-        model,
-        condition,
-        horsepower,
-        width,
-        height
-      },
-      { headers }
-    );
+    const response = await axiosInstance.post('/equipment/create-equipment', equipmentData);
+    return response.data;
   } catch (error) {
-    console.log('Error while calling createBooking API', error);
+    throw error.response?.data || error.message;
+  }
+};
+
+export const updateEquipment = async (id, equipmentData) => {
+  try {
+    const response = await axiosInstance.put(`/equipment/update-equipment/${id}`, equipmentData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+export const deleteEquipment = async (id) => {
+  try {
+    const response = await axiosInstance.delete(`/equipment/delete-equipment/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+export const getShopEquipment = async (shopId) => {
+  try {
+    const response = await axiosInstance.get(`/equipment/get-shop-equipment/${shopId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
   }
 };
 

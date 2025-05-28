@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiSearch, FiFilter, FiShoppingCart, FiStar } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
-import axios from 'axios';
+import axiosInstance from '../../../utils/axios';
 import { useAuth } from '../../../hooks/useAuth';
-
-const BASE_URL = '/api';
 
 const AllShopProducts = () => {
     const { user } = useAuth();
@@ -27,7 +25,7 @@ const AllShopProducts = () => {
     const fetchProducts = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`${BASE_URL}/product/get-all-products`);
+            const response = await axiosInstance.get('/product/get-all-products');
             
             if (response.data.success) {
                 const productsData = response.data.products || [];
@@ -47,13 +45,9 @@ const AllShopProducts = () => {
 
     const handleAddToCart = async (product) => {
         try {
-            const response = await axios.post(`${BASE_URL}/cart/add-to-cart`, {
+            const response = await axiosInstance.post('/cart/add-to-cart', {
                 productId: product._id,
                 quantity: 1
-            }, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
             });
             if (response.data.success) {
                 toast.success(`${product.name} added to cart!`);
@@ -66,14 +60,10 @@ const AllShopProducts = () => {
 
     const handleAddReview = async (productId, rating, comment) => {
         try {
-            const response = await axios.put(`${BASE_URL}/product/create-new-review`, {
+            const response = await axiosInstance.put('/product/create-new-review', {
                 productId,
                 rating,
                 comment
-            }, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
             });
             if (response.data.success) {
                 toast.success('Review added successfully!');

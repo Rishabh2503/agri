@@ -1,16 +1,5 @@
-import axios from 'axios';
+import axiosInstance from '../utils/axios';
 import { toast } from 'react-hot-toast';
-
-const BASE_URL = '/api';
-
-// Create axios instance with default config
-const axiosInstance = axios.create({
-  baseURL: BASE_URL,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
 // Add response interceptor for handling rate limiting
 axiosInstance.interceptors.response.use(

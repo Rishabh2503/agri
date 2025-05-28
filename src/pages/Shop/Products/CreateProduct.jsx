@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import axios from "axios";
+import axiosInstance from '../../../utils/axios';
 import { useAuth } from "../../../hooks/useAuth";
 import { motion } from 'framer-motion';
 import { FiUpload, FiX } from 'react-icons/fi';
@@ -52,7 +52,7 @@ const CreateProduct = () => {
             newForm.append("stock", stock);
             newForm.append("shopId", user._id);
 
-            const response = await axios.post("/api/product/create-product", newForm, {
+            const response = await axiosInstance.post("/product/create-product", newForm, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
