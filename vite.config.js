@@ -16,5 +16,17 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, '/api/v2')
       }
     }
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          ui: ['framer-motion', 'react-icons', 'react-hot-toast']
+        }
+      }
+    }
   }
 })
