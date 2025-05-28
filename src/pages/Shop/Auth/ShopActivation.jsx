@@ -1,71 +1,172 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { FiCheckCircle, FiAlertCircle, FiRefreshCw } from 'react-icons/fi';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
 const BASE_URL = 'https://krishimart-back.onrender.com/api/v2';
 
 const ShopActivation = () => {
+  const { activation_token } = useParams();
   const navigate = useNavigate();
-  const [activationToken, setActivationToken] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState('loading');
+  const [message, setMessage] = useState('');
+  const [retryCount, setRetryCount] = useState(0);
+  const MAX_RETRIES = 3;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  useEffect(() => {
+    const activateShop = async () => {
+      try {
+        const response = await axios.post(`${BASE_URL}/shop/activation`, {
+          activation_token
+        });
+
+        if (response.data.success) {
+          setStatus('success');
+          setMessage('Your shop account has been activated successfully!');
+          localStorage.setItem('shopActivationStatus', 'success');
+          
+          // Show success message
+          toast.success('Shop activated successfully!');
+          
+          // Redirect to login after 3 seconds
+          setTimeout(() => {
+            navigate('/shop/login', { 
+              state: { message: 'Please login with your shop credentials' }
+            });
+          }, 3000);
+        }
+      } catch (error) {
+        setStatus('error');
+        setMessage(error.response?.data?.message || 'Activation failed. Please try again.');
+        toast.error(error.response?.data?.message || 'Activation failed');
+      }
+    };
+
+    activateShop();
+  }, [activation_token, navigate]);
+
+  const handleRetry = async () => {
+    if (retryCount >= MAX_RETRIES) {
+      setMessage('Maximum retry attempts reached. Please try registering again.');
+      return;
+    }
+
+    setStatus('loading');
+    setRetryCount(prev => prev + 1);
 
     try {
-      const response = await axios.post(
-        `${BASE_URL}/shop/activation`,
-        { activation_token: activationToken }
-      );
+      const response = await axios.post(`${BASE_URL}/shop/activation`, {
+        activation_token
+      });
 
       if (response.data.success) {
-        toast.success('Account activated successfully!');
-        navigate('/shop/login');
+        setStatus('success');
+        setMessage('Your shop account has been activated successfully!');
+        localStorage.setItem('shopActivationStatus', 'success');
+        
+        toast.success('Shop activated successfully!');
+        
+        setTimeout(() => {
+          navigate('/shop/login', { 
+            state: { message: 'Please login with your shop credentials' }
+          });
+        }, 3000);
       }
     } catch (error) {
+      setStatus('error');
+      setMessage(error.response?.data?.message || 'Activation failed. Please try again.');
       toast.error(error.response?.data?.message || 'Activation failed');
-    } finally {
-      setLoading(false);
+    }
+  };
+
+  const renderContent = () => {
+    switch (status) {
+      case 'loading':
+        return (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className='text-center'>
+            <div className='flex justify-center mb-4'>
+              <FiRefreshCw className='w-12 h-12 text-blue-500 animate-spin' />
+            </div>
+            <h2 className='text-2xl font-semibold text-gray-800 mb-2'>
+              Activating your shop account...
+            </h2>
+            <p className='text-gray-600'>
+              Please wait while we activate your shop account.
+            </p>
+          </motion.div>
+        );
+
+      case 'success':
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className='text-center'>
+            <div className='flex justify-center mb-4'>
+              <FiCheckCircle className='w-12 h-12 text-green-500' />
+            </div>
+            <h2 className='text-2xl font-semibold text-gray-800 mb-2'>
+              Activation Successful!
+            </h2>
+            <p className='text-gray-600 mb-6'>{message}</p>
+            <p className='text-sm text-gray-500'>
+              Redirecting to login page...
+            </p>
+          </motion.div>
+        );
+
+      case 'error':
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className='text-center'>
+            <div className='flex justify-center mb-4'>
+              <FiAlertCircle className='w-12 h-12 text-red-500' />
+            </div>
+            <h2 className='text-2xl font-semibold text-gray-800 mb-2'>
+              Activation Failed
+            </h2>
+            <p className='text-gray-600 mb-6'>{message}</p>
+            <div className='space-y-4'>
+              {retryCount < MAX_RETRIES && (
+                <button
+                  onClick={handleRetry}
+                  className='w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors'>
+                  Try Again
+                </button>
+              )}
+              <button
+                onClick={() => navigate('/shop/register')}
+                className='w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 transition-colors'>
+                Register Again
+              </button>
+              <button
+                onClick={() => navigate('/shop/login')}
+                className='w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 transition-colors'>
+                Go to Login
+              </button>
+            </div>
+          </motion.div>
+        );
+
+      default:
+        return null;
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100 px-4">
-      <motion.div
-        className="bg-white rounded-2xl shadow-xl overflow-hidden w-full max-w-md p-8"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h2 className="text-3xl font-bold text-center text-green-600 mb-2">
-          Activate Your Shop
-        </h2>
-        <p className="text-gray-500 text-center mb-8">
-          Enter the activation token sent to your email
-        </p>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <input
-            type="text"
-            placeholder="Activation Token"
-            value={activationToken}
-            onChange={(e) => setActivationToken(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-            required
-          />
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors duration-300"
-          >
-            {loading ? 'Activating...' : 'Activate Account'}
-          </button>
-        </form>
-      </motion.div>
+    <div className='min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8'>
+      <div className='sm:mx-auto sm:w-full sm:max-w-md'>
+        <div className='bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10'>
+          {renderContent()}
+        </div>
+      </div>
     </div>
   );
 };

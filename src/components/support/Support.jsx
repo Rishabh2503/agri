@@ -11,7 +11,7 @@ const supportFeatures = [
   {
     icon: <FaUserShield className="w-12 h-12" />,
     title: "Verified Partners",
-    description: "All sellers and buyers are thoroughly verified for your safety and trust",
+    description: "All shop owners and buyers are thoroughly verified for your safety and trust",
     highlight: "100% Secure Platform"
   },
   {

@@ -31,9 +31,14 @@ const ListLand = lazy(() => import('./pages/LandLeasing/ListLand'));
 const ShopLogin = lazy(() => import('./pages/Shop/Auth/ShopLogin'));
 const ShopRegister = lazy(() => import('./pages/Shop/Auth/ShopRegister'));
 const ShopActivation = lazy(() => import('./pages/Shop/Auth/ShopActivation'));
+const ShopDashboard = lazy(() => import('./pages/Shop/Dashboard/ShopDashboard'));
+const ShopProducts = lazy(() => import('./pages/Shop/Products/ShopProducts'));
+const AllShopProducts = lazy(() => import('./pages/Shop/Products/AllShopProducts'));
+const CreateProduct = lazy(() => import('./pages/Shop/Products/CreateProduct'));
 const Cart = lazy(() => import('./pages/cart/Cart'));
 const Checkout = lazy(() => import('./pages/checkout/Checkout'));
 const OrderSummary = lazy(() => import('./pages/order/OrderSummary'));
+const UserActivation = lazy(() => import('./pages/UserActivation'));
 
 function App() {
   return (
@@ -134,22 +139,64 @@ function App() {
                     path='register'
                     element={<Register />}
                   />
+                  <Route
+                    path='activation/:activation_token'
+                    element={<UserActivation />}
+                  />
                 </Route>
+
+                {/* Shop Routes */}
                 <Route
                   path='/shop'
                   element={<MainLayout />}>
-                  {/* Shop Routes */}
                   <Route
-                    path='/shop/login'
+                    path='login'
                     element={<ShopLogin />}
                   />
                   <Route
-                    path='/shop/register'
+                    path='register'
                     element={<ShopRegister />}
                   />
-
                   <Route
-                    path='/shop/activation'
+                    path='activation/:activation_token'
+                    element={<ShopActivation />}
+                  />
+                  <Route
+                    path='dashboard'
+                    element={
+                      <ProtectedRoute>
+                        <ShopDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path='products'
+                    element={
+                      <ProtectedRoute>
+                        <ShopProducts />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path='all-products'
+                    element={<AllShopProducts />}
+                  />
+                  <Route
+                    path='create-product'
+                    element={
+                      <ProtectedRoute>
+                        <CreateProduct />
+                      </ProtectedRoute>
+                    }
+                  />
+                </Route>
+
+                {/* Shop Owner Routes - Alias for Shop Routes */}
+                <Route
+                  path='/seller'
+                  element={<MainLayout />}>
+                  <Route
+                    path='activation/:activation_token'
                     element={<ShopActivation />}
                   />
                 </Route>

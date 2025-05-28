@@ -159,11 +159,11 @@ const Login = () => {
 
         <div className='mt-6 pt-6 border-t border-gray-200'>
           <p className='text-center text-gray-600'>
-            Are you a seller?{' '}
+            Are you a shop owner?{' '}
             <Link
               to='/shop/login'
               className='text-green-600 hover:text-green-700 font-medium'>
-              Login as Seller
+              Login as Shop Owner
             </Link>
           </p>
         </div>
