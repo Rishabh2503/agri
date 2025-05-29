@@ -47,7 +47,7 @@ export const deleteProduct = async (id) => {
 
 export const getShopProducts = async (shopId) => {
   try {
-    const response = await axiosInstance.get(`/product/get-shop-products/${shopId}`);
+    const response = await axiosInstance.get(`/product/get-all-products-shop/${shopId}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;
