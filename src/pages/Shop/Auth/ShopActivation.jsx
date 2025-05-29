@@ -2,10 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiCheckCircle, FiAlertCircle, FiRefreshCw } from 'react-icons/fi';
-import axios from 'axios';
+import axiosInstance from '../../../utils/axios';
 import { toast } from 'react-hot-toast';
-
-const BASE_URL = 'https://krishimart-back.onrender.com/api/v2';
 
 const ShopActivation = () => {
   const { activation_token } = useParams();
@@ -18,7 +16,7 @@ const ShopActivation = () => {
   useEffect(() => {
     const activateShop = async () => {
       try {
-        const response = await axios.post(`${BASE_URL}/shop/activation`, {
+        const response = await axiosInstance.post('/shop/activation', {
           activation_token
         });
 
@@ -27,24 +25,36 @@ const ShopActivation = () => {
           setMessage('Your shop account has been activated successfully!');
           localStorage.setItem('shopActivationStatus', 'success');
           
-          // Show success message
           toast.success('Shop activated successfully!');
           
           // Redirect to login after 3 seconds
           setTimeout(() => {
             navigate('/shop/login', { 
-              state: { message: 'Please login with your shop credentials' }
+              state: { 
+                message: 'Please login with your shop credentials',
+                email: response.data.email // Pass email if available
+              }
             });
           }, 3000);
+        } else {
+          throw new Error(response.data.message || 'Activation failed');
         }
       } catch (error) {
+        console.error('Activation error:', error);
         setStatus('error');
-        setMessage(error.response?.data?.message || 'Activation failed. Please try again.');
-        toast.error(error.response?.data?.message || 'Activation failed');
+        const errorMessage = error.response?.data?.message || 'Activation failed. Please try again.';
+        setMessage(errorMessage);
+        toast.error(errorMessage);
       }
     };
 
-    activateShop();
+    if (activation_token) {
+      activateShop();
+    } else {
+      setStatus('error');
+      setMessage('Invalid activation link');
+      toast.error('Invalid activation link');
+    }
   }, [activation_token, navigate]);
 
   const handleRetry = async () => {
@@ -57,7 +67,7 @@ const ShopActivation = () => {
     setRetryCount(prev => prev + 1);
 
     try {
-      const response = await axios.post(`${BASE_URL}/shop/activation`, {
+      const response = await axiosInstance.post('/shop/activation', {
         activation_token
       });
 
@@ -70,14 +80,21 @@ const ShopActivation = () => {
         
         setTimeout(() => {
           navigate('/shop/login', { 
-            state: { message: 'Please login with your shop credentials' }
+            state: { 
+              message: 'Please login with your shop credentials',
+              email: response.data.email // Pass email if available
+            }
           });
         }, 3000);
+      } else {
+        throw new Error(response.data.message || 'Activation failed');
       }
     } catch (error) {
+      console.error('Retry activation error:', error);
       setStatus('error');
-      setMessage(error.response?.data?.message || 'Activation failed. Please try again.');
-      toast.error(error.response?.data?.message || 'Activation failed');
+      const errorMessage = error.response?.data?.message || 'Activation failed. Please try again.';
+      setMessage(errorMessage);
+      toast.error(errorMessage);
     }
   };
 
@@ -104,8 +121,8 @@ const ShopActivation = () => {
       case 'success':
         return (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             className='text-center'>
             <div className='flex justify-center mb-4'>
               <FiCheckCircle className='w-12 h-12 text-green-500' />
@@ -113,7 +130,9 @@ const ShopActivation = () => {
             <h2 className='text-2xl font-semibold text-gray-800 mb-2'>
               Activation Successful!
             </h2>
-            <p className='text-gray-600 mb-6'>{message}</p>
+            <p className='text-gray-600 mb-4'>
+              {message}
+            </p>
             <p className='text-sm text-gray-500'>
               Redirecting to login page...
             </p>
@@ -123,8 +142,8 @@ const ShopActivation = () => {
       case 'error':
         return (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             className='text-center'>
             <div className='flex justify-center mb-4'>
               <FiAlertCircle className='w-12 h-12 text-red-500' />
@@ -132,7 +151,9 @@ const ShopActivation = () => {
             <h2 className='text-2xl font-semibold text-gray-800 mb-2'>
               Activation Failed
             </h2>
-            <p className='text-gray-600 mb-6'>{message}</p>
+            <p className='text-gray-600 mb-6'>
+              {message}
+            </p>
             <div className='space-y-4'>
               {retryCount < MAX_RETRIES && (
                 <button

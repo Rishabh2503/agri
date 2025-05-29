@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import { FaUser, FaEnvelope, FaLock, FaPhone, FaMapMarkerAlt, FaHome } from 'react-icons/fa';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -28,163 +28,182 @@ const Register = () => {
   });
 
   // Error states
-  const [errors, setErrors] = useState({
-    name: "",
-    email: "",
-    password: "",
-    phoneNumber: "",
-    address1: "",
-    city: "",
-    zipCode: "",
-  });
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Name validation
+    if (!name.trim()) {
+      newErrors.name = "Name is required";
+    } else if (name.length < 2) {
+      newErrors.name = "Name must be at least 2 characters";
+    }
+
+    // Email validation
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    // Password validation
+    if (!password) {
+      newErrors.password = "Password is required";
+    } else if (password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+      newErrors.password = "Password must contain at least one uppercase letter, one lowercase letter, and one number";
+    }
+
+    // Phone validation
+    if (!phoneNumber) {
+      newErrors.phoneNumber = "Phone number is required";
+    } else if (!/^\d{10}$/.test(phoneNumber)) {
+      newErrors.phoneNumber = "Please enter a valid 10-digit phone number";
+    }
+
+    // Address validation
+    if (!address.address1.trim()) {
+      newErrors.address1 = "Address Line 1 is required";
+    }
+    if (!address.city.trim()) {
+      newErrors.city = "City is required";
+    }
+    if (!address.zipCode) {
+      newErrors.zipCode = "Zip Code is required";
+    } else if (!/^\d{6}$/.test(address.zipCode)) {
+      newErrors.zipCode = "Please enter a valid 6-digit zip code";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleFileInputChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        toast.error("Please upload an image file");
+        return;
+      }
+      
+      // Check file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
         toast.error("File size should be less than 5MB");
         return;
       }
+      
       setAvatar(file);
+      setErrors(prev => ({ ...prev, avatar: null }));
     }
   };
 
   const handleAddressChange = (e) => {
     const { name, value } = e.target;
-    setAddress((prev) => ({
+    setAddress(prev => ({
       ...prev,
       [name]: value
     }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: null }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Reset errors
-    setErrors({
-      name: "",
-      email: "",
-      password: "",
-      phoneNumber: "",
-      address1: "",
-      city: "",
-      zipCode: "",
-    });
-
-    let isValid = true;
-    const newErrors = {};
-
-    // Validation logic for each field
-    if (!name) {
-      newErrors.name = "Name is required";
-      isValid = false;
-    }
-    if (!email) {
-      newErrors.email = "Email is required";
-      isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = "Please enter a valid email address";
-      isValid = false;
-    }
-    if (!password) {
-      newErrors.password = "Password is required";
-      isValid = false;
-    } else if (password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters long";
-      isValid = false;
-    }
-    if (!phoneNumber) {
-      newErrors.phoneNumber = "Phone number is required";
-      isValid = false;
-    }
-    if (!address.address1) {
-      newErrors.address1 = "Address Line 1 is required";
-      isValid = false;
-    }
-    if (!address.city) {
-      newErrors.city = "City is required";
-      isValid = false;
-    }
-    if (!address.zipCode) {
-      newErrors.zipCode = "Zip Code is required";
-      isValid = false;
+    
+    if (!validateForm() || isSubmitting) {
+      return;
     }
 
-    setErrors(newErrors);
+    setIsSubmitting(true);
 
-    if (isValid) {
-      try {
-        // Create FormData to send the data
-        const formData = new FormData();
-        if (avatar) {
-          formData.append("file", avatar);
-        }
-        formData.append("name", name);
-        formData.append("email", email);
-        formData.append("password", password);
-        formData.append("phoneNumber", phoneNumber);
-
-        // Create address object from the state and append to formData
-        const addressObject = {
-          ...address,
-          zipCode: Number(address.zipCode), // Ensure zip code is a number
-        };
-
-        formData.append("addresses", JSON.stringify([addressObject]));
-
-        const response = await register(formData);
-        
-        if (response) {
-          // Show success message with activation instructions
-          toast.success(
-            "Registration successful! Please check your email for the activation link.",
-            {
-              duration: 5000,
-              position: "top-center",
-            }
-          );
-
-          // Clear form
-          setName("");
-          setEmail("");
-          setPassword("");
-          setPhoneNumber("");
-          setAddress({
-            address1: "",
-            address2: "",
-            zipCode: "",
-            country: "India",
-            city: "",
-            addressType: "Home"
-          });
-          setAvatar(null);
-
-          // Show activation instructions modal
-          toast.custom((t) => (
-            <div className="bg-white p-4 rounded-lg shadow-lg">
-              <h3 className="font-bold text-lg mb-2">Next Steps:</h3>
-              <ol className="list-decimal list-inside space-y-2">
-                <li>Check your email for the activation link</li>
-                <li>Click the activation link in the email</li>
-                <li>Once activated, you can login to your account</li>
-              </ol>
-            </div>
-          ), {
-            duration: 8000,
-            position: "top-center",
-          });
-
-          // Redirect to login page after 5 seconds
-          setTimeout(() => {
-            navigate('/login');
-          }, 5000);
-        }
-      } catch (error) {
-        console.error("Registration failed:", error);
-        toast.error(error.message || "Registration failed. Please try again.");
+    try {
+      // Create FormData
+      const formData = new FormData();
+      
+      // Append user data
+      formData.append("name", name.trim());
+      formData.append("email", email.trim().toLowerCase());
+      formData.append("password", password);
+      formData.append("phoneNumber", phoneNumber);
+      
+      // Append avatar if exists
+      if (avatar) {
+        formData.append("file", avatar);
       }
-    } else {
-      toast.error("Please fill out all required fields correctly.");
+
+      // Create address object and append
+      const addressObject = {
+        ...address,
+        zipCode: Number(address.zipCode),
+      };
+      formData.append("addresses", JSON.stringify([addressObject]));
+
+      // Store email for activation
+      localStorage.setItem('registrationEmail', email.trim().toLowerCase());
+
+      const response = await register(formData);
+      
+      if (response.success) {
+        // Clear form
+        setName("");
+        setEmail("");
+        setPassword("");
+        setPhoneNumber("");
+        setAddress({
+          address1: "",
+          address2: "",
+          zipCode: "",
+          country: "India",
+          city: "",
+          addressType: "Home"
+        });
+        setAvatar(null);
+        
+        // Show success message
+        toast.success("Registration successful! Please check your email for the activation link.");
+        
+        // Show activation instructions
+        toast.custom((t) => (
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <h3 className="font-bold text-lg mb-2">Next Steps:</h3>
+            <ol className="list-decimal list-inside space-y-2">
+              <li>Check your email ({email}) for the activation link</li>
+              <li>Click the activation link in the email</li>
+              <li>Once activated, you can login to your account</li>
+            </ol>
+          </div>
+        ), {
+          duration: 8000,
+          position: "top-center",
+        });
+
+        // Redirect to login page after 5 seconds
+        setTimeout(() => {
+          navigate('/login', { 
+            state: { 
+              message: 'Registration successful! Please check your email for activation.',
+              email: email.trim().toLowerCase()
+            }
+          });
+        }, 5000);
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      const errorMessage = error.message || "Registration failed. Please try again.";
+      toast.error(errorMessage);
+      
+      // Set specific field errors if available
+      if (error.errors) {
+        setErrors(error.errors);
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
