@@ -7,23 +7,30 @@ import { FiEdit2, FiTrash2, FiPlus } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
 const ShopProducts = () => {
-    const { user } = useAuth();
+    const { user, isShop } = useAuth();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchProducts();
-    }, []);
+        if (isShop && user?._id) {
+            fetchProducts();
+        }
+    }, [isShop, user]);
 
     const fetchProducts = async () => {
         try {
+            setLoading(true);
             const response = await getShopProducts(user._id);
             if (response.success) {
-                setProducts(response.products);
+                setProducts(response.products || []);
+            } else {
+                toast.error(response.message || 'Failed to fetch products');
+                setProducts([]);
             }
         } catch (error) {
-            toast.error('Failed to fetch products');
             console.error('Error fetching products:', error);
+            toast.error(error.message || 'Failed to fetch products');
+            setProducts([]);
         } finally {
             setLoading(false);
         }
@@ -36,10 +43,12 @@ const ShopProducts = () => {
                 if (response.success) {
                     toast.success('Product deleted successfully');
                     fetchProducts(); // Refresh the products list
+                } else {
+                    toast.error(response.message || 'Failed to delete product');
                 }
             } catch (error) {
-                toast.error('Failed to delete product');
                 console.error('Error deleting product:', error);
+                toast.error(error.message || 'Failed to delete product');
             }
         }
     };
