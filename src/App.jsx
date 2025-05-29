@@ -199,7 +199,29 @@ function App() {
                     path='activation/:activation_token'
                     element={<ShopActivation />}
                   />
+                  <Route
+                    path='*'
+                    element={<Navigate to="/shop/login" replace />}
+                  />
                 </Route>
+
+                {/* Catch all route for shop activation */}
+                <Route
+                  path='/seller/activation/:activation_token'
+                  element={<ShopActivation />}
+                />
+
+                {/* Catch all route for invalid URLs */}
+                <Route
+                  path='*'
+                  element={
+                    <Navigate
+                      to="/"
+                      replace
+                      state={{ message: "Page not found" }}
+                    />
+                  }
+                />
               </Routes>
               <Footer />
             </Suspense>

@@ -1,46 +1,63 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { activateUser } from '../services/authService';
-import toast from 'react-hot-toast';
+import { FiCheckCircle, FiAlertCircle, FiRefreshCw } from 'react-icons/fi';
+import axiosInstance from '../utils/axios';
+import { toast } from 'react-hot-toast';
 
-const ActivationPage = () => {
+const UserActivation = () => {
   const { activation_token } = useParams();
   const navigate = useNavigate();
-  const [status, setStatus] = useState('loading'); // 'loading' | 'success' | 'error'
+  const [status, setStatus] = useState('loading');
   const [message, setMessage] = useState('');
   const [retryCount, setRetryCount] = useState(0);
+  const [email, setEmail] = useState('');
   const MAX_RETRIES = 3;
 
   useEffect(() => {
+    // Get email from localStorage
+    const storedEmail = localStorage.getItem('registrationEmail');
+    if (storedEmail) {
+      setEmail(storedEmail);
+    }
+
     if (!activation_token) {
       setStatus('error');
       setMessage('Invalid activation link. Please check your email for the correct link.');
+      toast.error('Invalid activation link');
       return;
     }
 
     const activateAccount = async () => {
       try {
-        const response = await activateUser(activation_token);
-        setStatus('success');
-        setMessage(response.message || 'Your account has been activated successfully!');
-        toast.success('Account activated successfully!');
-        
-        // Store activation status in localStorage
-        localStorage.setItem('accountActivated', 'true');
-        
-        // Redirect to login after 3 seconds
-        setTimeout(() => {
-          navigate('/login', { 
-            state: { 
-              message: 'Account activated successfully! Please login to continue.' 
-            }
-          });
-        }, 3000);
-      } catch (err) {
-        console.error('Activation error:', err);
+        const response = await axiosInstance.post('/user/activation', {
+          activation_token
+        });
+
+        if (response.data.success) {
+          setStatus('success');
+          setMessage('Your account has been activated successfully!');
+          localStorage.setItem('accountActivated', 'true');
+          localStorage.removeItem('registrationEmail'); // Clear stored email
+          
+          toast.success('Account activated successfully!');
+          
+          // Redirect to login after 3 seconds
+          setTimeout(() => {
+            navigate('/login', { 
+              state: { 
+                message: 'Account activated successfully! Please login to continue.',
+                email: email // Pass email to login page
+              }
+            });
+          }, 3000);
+        } else {
+          throw new Error(response.data.message || 'Activation failed');
+        }
+      } catch (error) {
+        console.error('Activation error:', error);
         setStatus('error');
-        const errorMessage = err.message || 'Activation failed. Please try again or contact support.';
+        const errorMessage = error.response?.data?.message || 'Activation failed. Please try again.';
         setMessage(errorMessage);
         toast.error(errorMessage);
 
@@ -56,11 +73,48 @@ const ActivationPage = () => {
     };
 
     activateAccount();
-  }, [activation_token, navigate, retryCount]);
+  }, [activation_token, navigate, retryCount, email]);
 
-  const handleRetry = () => {
+  const handleRetry = async () => {
+    if (retryCount >= MAX_RETRIES) {
+      setMessage('Maximum retry attempts reached. Please try registering again.');
+      return;
+    }
+
     setStatus('loading');
-    setRetryCount(0);
+    setRetryCount(prev => prev + 1);
+
+    try {
+      const response = await axiosInstance.post('/user/activation', {
+        activation_token
+      });
+
+      if (response.data.success) {
+        setStatus('success');
+        setMessage('Your account has been activated successfully!');
+        localStorage.setItem('accountActivated', 'true');
+        localStorage.removeItem('registrationEmail');
+        
+        toast.success('Account activated successfully!');
+        
+        setTimeout(() => {
+          navigate('/login', { 
+            state: { 
+              message: 'Account activated successfully! Please login to continue.',
+              email: email
+            }
+          });
+        }, 3000);
+      } else {
+        throw new Error(response.data.message || 'Activation failed');
+      }
+    } catch (error) {
+      console.error('Retry activation error:', error);
+      setStatus('error');
+      const errorMessage = error.response?.data?.message || 'Activation failed. Please try again.';
+      setMessage(errorMessage);
+      toast.error(errorMessage);
+    }
   };
 
   const renderContent = () => {
@@ -70,11 +124,14 @@ const ActivationPage = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-blue-600 text-center"
-          >
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-lg font-medium">Activating your account...</p>
-            <p className="text-sm text-gray-500 mt-2">
+            className="text-center">
+            <div className="flex justify-center mb-4">
+              <FiRefreshCw className="w-12 h-12 text-blue-500 animate-spin" />
+            </div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+              Activating your account...
+            </h2>
+            <p className="text-gray-600">
               {retryCount > 0 ? `Retry attempt ${retryCount} of ${MAX_RETRIES}` : 'Please wait while we verify your account'}
             </p>
           </motion.div>
@@ -83,71 +140,56 @@ const ActivationPage = () => {
       case 'success':
         return (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-green-600 text-center"
-          >
-            <svg 
-              className="w-16 h-16 mx-auto mb-4" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth="2" 
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-            <p className="text-xl font-semibold mb-2">Success!</p>
-            <p className="mb-4">{message}</p>
-            <p className="text-sm text-gray-500">Redirecting to login page...</p>
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center">
+            <div className="flex justify-center mb-4">
+              <FiCheckCircle className="w-12 h-12 text-green-500" />
+            </div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+              Activation Successful!
+            </h2>
+            <p className="text-gray-600 mb-4">
+              {message}
+            </p>
+            <p className="text-sm text-gray-500">
+              Redirecting to login page...
+            </p>
           </motion.div>
         );
 
       case 'error':
         return (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-red-600 text-center"
-          >
-            <svg 
-              className="w-16 h-16 mx-auto mb-4" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth="2" 
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-            <p className="text-xl font-semibold mb-2">Activation Failed</p>
-            <p className="mb-4">{message}</p>
-            <div className="space-y-3">
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center">
+            <div className="flex justify-center mb-4">
+              <FiAlertCircle className="w-12 h-12 text-red-500" />
+            </div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+              Activation Failed
+            </h2>
+            <p className="text-gray-600 mb-6">
+              {message}
+            </p>
+            <div className="space-y-4">
               {retryCount < MAX_RETRIES && (
                 <button
                   onClick={handleRetry}
-                  className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                >
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
                   Try Again
                 </button>
               )}
               <button
                 onClick={() => navigate('/login')}
-                className="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-              >
+                className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 transition-colors">
                 Go to Login
               </button>
               <button
                 onClick={() => navigate('/register')}
-                className="block w-full px-4 py-2 text-red-600 hover:text-red-700 transition-colors"
-              >
-                Try Registering Again
+                className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 transition-colors">
+                Register Again
               </button>
             </div>
           </motion.div>
@@ -167,4 +209,4 @@ const ActivationPage = () => {
   );
 };
 
-export default ActivationPage;
+export default UserActivation;

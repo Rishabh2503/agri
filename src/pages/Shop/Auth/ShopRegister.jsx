@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { Link, useNavigate } from 'react-router-dom';
 import { RxAvatar } from 'react-icons/rx';
-import axios from 'axios';
+import axiosInstance from '../../../utils/axios';
 import { toast } from 'react-hot-toast';
-
-const BASE_URL = 'https://krishimart-back.onrender.com/api/v2';
 
 const ShopRegister = () => {
   const navigate = useNavigate();
@@ -17,52 +15,61 @@ const ShopRegister = () => {
   const [avatar, setAvatar] = useState();
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const config = { headers: { "Content-Type": "multipart/form-data" } };
-
-    const newForm = new FormData();
-    newForm.append("file", avatar);
-    newForm.append("name", name);
-    newForm.append("email", email);
-    newForm.append("password", password);
-    newForm.append("zipCode", zipCode);
-    newForm.append("address", address);
-    newForm.append("phoneNumber", phoneNumber);
+    setLoading(true);
 
     try {
-      const response = await axios.post(`${BASE_URL}/shop/create-shop`, newForm, config);
-      toast.success(response.data.message);
-      
-      // Clear form
-      setName("");
-      setEmail("");
-      setPassword("");
-      setAvatar();
-      setZipCode();
-      setAddress("");
-      setPhoneNumber();
-      
-      // Show activation instructions
-      toast.custom((t) => (
-        <div className="bg-white p-4 rounded-lg shadow-lg">
-          <h3 className="font-bold text-lg mb-2">Next Steps:</h3>
-          <ol className="list-decimal list-inside space-y-2">
-            <li>Check your email for the activation link</li>
-            <li>Click the activation link in the email</li>
-            <li>Once activated, you can login to your shop account</li>
-          </ol>
-        </div>
-      ), {
-        duration: 8000,
-        position: "top-center",
+      const newForm = new FormData();
+      newForm.append("file", avatar);
+      newForm.append("name", name);
+      newForm.append("email", email);
+      newForm.append("password", password);
+      newForm.append("zipCode", zipCode);
+      newForm.append("address", address);
+      newForm.append("phoneNumber", phoneNumber);
+
+      const response = await axiosInstance.post('/shop/create-shop', newForm, {
+        headers: { "Content-Type": "multipart/form-data" }
       });
-      
-      navigate("/shop/login");
+
+      if (response.data.success) {
+        toast.success(response.data.message || 'Registration successful!');
+        
+        // Clear form
+        setName("");
+        setEmail("");
+        setPassword("");
+        setAvatar();
+        setZipCode();
+        setAddress("");
+        setPhoneNumber();
+        
+        // Show activation instructions
+        toast.custom((t) => (
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <h3 className="font-bold text-lg mb-2">Next Steps:</h3>
+            <ol className="list-decimal list-inside space-y-2">
+              <li>Check your email for the activation link</li>
+              <li>Click the activation link in the email</li>
+              <li>Once activated, you can login to your shop account</li>
+            </ol>
+          </div>
+        ), {
+          duration: 8000,
+          position: "top-center",
+        });
+        
+        navigate("/shop/login");
+      }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Registration failed');
+      console.error('Registration error:', error);
+      const errorMessage = error.response?.data?.message || 'Registration failed. Please try again.';
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -242,9 +249,10 @@ const ShopRegister = () => {
             <div>
               <button
                 type='submit'
-                className='group relative w-full h-[40px] flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700'
+                disabled={loading}
+                className='group relative w-full h-[40px] flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed'
               >
-                Submit
+                {loading ? 'Registering...' : 'Submit'}
               </button>
             </div>
 
